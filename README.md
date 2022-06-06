@@ -1,4 +1,4 @@
-# otree_experiment
+# Otree Experiment on Sticky Prices
 Sticky prices experiment based on oTree.
 
 Players will play as different firms and decide if they will change their prices given an upcoming cost shock; whoever gets the highest profit wins.
