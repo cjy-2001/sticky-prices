@@ -1,16 +1,16 @@
-{{ block title }}Your Guess{{ endblock }}
+{{ block title }}Your Decision{{ endblock }}
 {{ block content }}
 
     {{ if player.round_number > 1 }}
         <p>
-            Here were the two-thirds-average values in previous rounds:
-            {{ two_thirds_avg_history }}
+            Here were the average prices in previous rounds:
+            {{ avg_history }}
         </p>
     {{ endif }}
 
+    {{ include C.INSTRUCTIONS_TEMPLATE }}
+
     {{ formfields }}
     {{ next_button }}
-
-    {{ include C.INSTRUCTIONS_TEMPLATE }}
 
 {{ endblock }}

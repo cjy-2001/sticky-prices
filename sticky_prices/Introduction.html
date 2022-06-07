@@ -1,7 +1,22 @@
 {{ block title }}Introduction{{ endblock }}
 {{ block content }}
 
-    {{ include C.INSTRUCTIONS_TEMPLATE }}
+    <p>
+        The experiment will be a sequence of one-shot pricing games, where each round players(firms) all start at a common price.
+        You will be informed of how marginal costs will change and can decide if and how you would like to adjust your prices.
+        You will be given the new production cost and other information to help you make the decision.
+    </p>
+
+    <p>
+        <em>
+          Your goal is to get the highest profit.
+        </em>
+
+    </p>
+
+    <p>
+        Now you are in a group of {{ C.PLAYERS_PER_GROUP }} people, and this game will be played for {{ C.NUM_ROUNDS }} rounds.
+    </p>
 
     {{ next_button }}
 

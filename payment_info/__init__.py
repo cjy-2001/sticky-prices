@@ -12,6 +12,7 @@ class C(BaseConstants):
     NAME_IN_URL = 'payment_info'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
+    COMPLETION_CODE = "123456789"
 
 
 class Subsession(BaseSubsession):

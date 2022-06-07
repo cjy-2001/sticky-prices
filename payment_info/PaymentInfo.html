@@ -2,9 +2,10 @@
 {{ block content }}
 
     <p>
-        <em>Below are examples of messages that could be displayed for different experimental settings.</em>
+        <em>Thank you very much for your input on this experiment!</em>
     </p>
 
+    <!--
     <div class="panel panel-default" style="margin-bottom:10px">
         <div class="panel-body">
             <p><b>Laboratory:</b></p>
@@ -12,18 +13,11 @@
             <p><em>Note: For the cashier in the laboratory, oTree can print a list of payments for all participants as a PDF.</em></p>
         </div>
     </div>
+    -->
 
-    <div class="panel panel-default" style="margin-bottom:10px">
-        <div class="panel-body">
-            <p><b>Classroom:</b></p>
-            <p><em>If you want to keep track of how students did, the easiest thing is to assign the starting links to students by name.
-                It is even possible to give each student a single permanent link for a whole semester using Rooms;
-                so no need to waste time in each lecture with handing out new links and keeping track of which student uses which link.
-                Alternatively, you may just give
-                students anonymous links or secret nicknames.</em>
-            </p>
-        </div>
-    </div>
+    <b>
+        Your completion code is: {{C.COMPLETION_CODE}}.
+    </b>
 
 
 {{ endblock }}
