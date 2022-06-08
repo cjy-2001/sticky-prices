@@ -1,16 +1,22 @@
 {{ block title }}Your Decision{{ endblock }}
 {{ block content }}
 
-    {{ if player.round_number > 1 }}
+    <!--{{ if player.round_number > 1 }}
         <p>
             Here were the average prices in previous rounds:
             {{ avg_history }}
         </p>
-    {{ endif }}
+    {{ endif }}-->
 
     {{ include C.INSTRUCTIONS_TEMPLATE }}
 
+    <p>Do you wish to adjust your price?</p>
+    <button name="is_adjusted" value="True">Yes</button>
+    <button name="is_adjusted" value="False">No</button>
+
+    <!--
     {{ formfields }}
     {{ next_button }}
+    -->
 
 {{ endblock }}

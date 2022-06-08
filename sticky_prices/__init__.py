@@ -15,16 +15,16 @@ class C(BaseConstants):
     NUM_ROUNDS = 3
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
-    PRICE_MAX = 100
+    PRICE_MAX = cu(100)
     PAYMENT = 100
 
-    INIT_PRICE = [10] * NUM_ROUNDS
-    INIT_PRODUCT_COST = [9.2] * NUM_ROUNDS
-    NEW_PRODUCT_COST = ([8.7, 10.7, 8.7])
-    ALPHA = [9] * NUM_ROUNDS
-    THETA = [1.8] * NUM_ROUNDS
-    BETA = [2.5] * NUM_ROUNDS
-    ADJUST_COST = [3] * NUM_ROUNDS
+    INIT_PRICE = [cu(10)] * NUM_ROUNDS
+    INIT_PRODUCT_COST = [cu(9.2)] * NUM_ROUNDS
+    NEW_PRODUCT_COST = ([cu(8.7), cu(10.7), cu(8.7)])
+    ALPHA = [cu(9)] * NUM_ROUNDS
+    THETA = [cu(1.8)] * NUM_ROUNDS
+    BETA = [cu(2.5)] * NUM_ROUNDS
+    ADJUST_COST = [cu(3)] * NUM_ROUNDS
 
 
 class Subsession(BaseSubsession):
@@ -32,22 +32,22 @@ class Subsession(BaseSubsession):
 
 
 class Group(BaseGroup):
-    avg = models.FloatField()
-    best_price = models.IntegerField()
-    best_profit = models.FloatField()
+    avg = models.CurrencyField()
+    best_price = models.CurrencyField()
+    best_profit = models.CurrencyField()
     num_winners = models.IntegerField()
 
-    init_price = models.FloatField()
-    cost = models.FloatField()
-    alpha = models.FloatField()
-    theta = models.FloatField()
-    beta = models.FloatField()
-    adjust_cost = models.FloatField()
+    init_price = models.CurrencyField()
+    cost = models.CurrencyField()
+    alpha = models.CurrencyField()
+    theta = models.CurrencyField()
+    beta = models.CurrencyField()
+    adjust_cost = models.CurrencyField()
 
 
 class Player(BasePlayer):
-    price = models.IntegerField(
-        min=0, max=C.PRICE_MAX, label="Please enter your new price (you can keep the initial price):"
+    price = models.CurrencyField(
+        min=cu(0), max=C.PRICE_MAX, label="Please enter your new price (you can keep the initial price):"
     )
     is_winner = models.BooleanField(initial=False)
     is_adjusted = models.BooleanField(initial=False)
@@ -57,13 +57,13 @@ class Player(BasePlayer):
 # FUNCTIONS
 def set_payoffs(group: Group):
     players = group.get_players()
+    #Decide if the player adjusted
+    for p in players:
+        if not p.is_adjusted:
+            p.price = p.group.init_price
     prices = [p.price for p in players]
     avg = sum(prices) / len(players)
     group.avg = round(avg, 2)
-    #Decide if the player adjusted
-    for p in players:
-        if p.price != p.group.init_price:
-            p.is_adjusted = True
     #Calculate all profits
     profits = [calc_profit(p) for p in players]
     group.best_profit = max(profits)
@@ -91,13 +91,13 @@ def creating_session(subsession):
 
 
 def calc_profit(player: Player):
-    gross_profit = (player.price - player.group.cost) * \
-                       (player.group.alpha - player.group.beta * player.price + player.group.theta * player.group.avg)
+    gross_profit = cu((player.price - player.group.cost) * \
+                       (player.group.alpha - player.group.beta * player.price + player.group.theta * player.group.avg))
 
     if player.is_adjusted:
-        return round(gross_profit - player.group.adjust_cost, 2)
+        return gross_profit - player.group.adjust_cost
     else:
-        return round(gross_profit, 2)
+        return gross_profit
 
 
 # PAGES
@@ -109,6 +109,21 @@ class Introduction(Page):
 
 class Guess(Page):
     form_model = 'player'
+    form_fields = ['is_adjusted']
+    #form_fields = ['price']
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+
+        return dict(avg_history=avg_history(group))
+
+class Guess2(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.is_adjusted
+
+    form_model = 'player'
     form_fields = ['price']
 
     @staticmethod
@@ -116,6 +131,7 @@ class Guess(Page):
         group = player.group
 
         return dict(avg_history=avg_history(group))
+
 
 
 class ResultsWaitPage(WaitPage):
@@ -132,4 +148,4 @@ class Results(Page):
                     profit = calc_profit(player))
 
 
-page_sequence = [Introduction, Guess, ResultsWaitPage, Results]
+page_sequence = [Introduction, Guess, Guess2, ResultsWaitPage, Results]

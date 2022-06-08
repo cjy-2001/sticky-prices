@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{{ if player.is_adjusted }}
+    {{ block title }}Your Decision{{ endblock }}
+    {{ block content }}
+
+        {{ if player.round_number > 1 }}
+            <p>
+                Here were the average prices in previous rounds:
+                {{ avg_history }}
+            </p>
+        {{ endif }}
+
+        {{ include C.INSTRUCTIONS_TEMPLATE }}
+        {{ formfields }}
+        {{ next_button }}
+
+    {{ endblock }}
+{{ endif }}
