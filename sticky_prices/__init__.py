@@ -46,38 +46,40 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    prob7 = models.IntegerField(min=0, max=100, label="$7:")
+    prob8 = models.IntegerField(min=0, max=100, label="$8:")
+    prob9 = models.IntegerField(min=0, max=100, label="$9:")
+    prob10 = models.IntegerField(min=0, max=100, label="$10:")
+    prob11 = models.IntegerField(min=0, max=100, label="$11:")
+    prob12 = models.IntegerField(min=0, max=100, label="$12:")
+    prob13 = models.IntegerField(min=0, max=100, label="$13:")
+    expected_avg = models.CurrencyField()
+    #expected_profit = models.CurrencyField()
     price = models.CurrencyField(
-        min=cu(0), max=C.PRICE_MAX, label="Please enter your new price (you can keep the initial price):"
+        min=cu(0), max=C.PRICE_MAX, label="Please enter your new price:"
     )
+    profit = models.CurrencyField()
     is_winner = models.BooleanField(initial=False)
     is_adjusted = models.BooleanField(initial=False)
-
+    redo = models.BooleanField(initial=False)
 
 
 # FUNCTIONS
 def set_payoffs(group: Group):
     players = group.get_players()
-    #Decide if the player adjusted
-    for p in players:
-        if not p.is_adjusted:
-            p.price = p.group.init_price
     prices = [p.price for p in players]
-    avg = sum(prices) / len(players)
-    group.avg = round(avg, 2)
-    #Calculate all profits
-    profits = [calc_profit(p) for p in players]
+    group.avg = sum(prices) / len(players)
+    for p in players:
+        p.profit = calc_profit(p, group.avg)
+    profits = [p.profit for p in players]
     group.best_profit = max(profits)
-    best_player = max(players, key=lambda player: calc_profit(player))
+    best_player = max(players, key=lambda player: player.profit)
     group.best_price = best_player.price
     winners = [p for p in players if p.price == group.best_price]
     group.num_winners = len(winners)
     for p in winners:
         p.is_winner = True
         p.payoff = C.PAYMENT / group.num_winners
-
-
-def avg_history(group: Group):
-    return [g.avg for g in group.in_previous_rounds()]
 
 
 def creating_session(subsession):
@@ -90,9 +92,9 @@ def creating_session(subsession):
         group.init_price = C.INIT_PRICE[subsession.round_number - 1]
 
 
-def calc_profit(player: Player):
+def calc_profit(player: Player, group_avg):
     gross_profit = cu((player.price - player.group.cost) * \
-                       (player.group.alpha - player.group.beta * player.price + player.group.theta * player.group.avg))
+                       (player.group.alpha - player.group.beta * player.price + player.group.theta * group_avg))
 
     if player.is_adjusted:
         return gross_profit - player.group.adjust_cost
@@ -107,16 +109,32 @@ class Introduction(Page):
         return player.round_number == 1
 
 
+class Probability(Page):
+    form_model = 'player'
+    form_fields = ['prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13']
+
+    @staticmethod
+    def error_message(player, values):
+        print('values is', values)
+        if values['prob7'] + values['prob8'] + values['prob9'] + values['prob10'] + values['prob11'] + values['prob12'] + values['prob13'] != 100:
+            return 'The numbers must add up to 100'
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        player.expected_avg = cu(7 * player.prob7 + 8 * player.prob8 + 9 * player.prob9 + 10 * player.prob10 + 11 * player.prob11 +
+                                 12 * player.prob12 + 13 * player.prob13) / 100
+
+
 class Guess(Page):
     form_model = 'player'
     form_fields = ['is_adjusted']
-    #form_fields = ['price']
 
     @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
+    def before_next_page(player, timeout_happened):
+        if not player.is_adjusted:
+            player.price = player.group.init_price
+            player.profit = calc_profit(player, player.expected_avg)
 
-        return dict(avg_history=avg_history(group))
 
 class Guess2(Page):
     @staticmethod
@@ -127,11 +145,91 @@ class Guess2(Page):
     form_fields = ['price']
 
     @staticmethod
+    def before_next_page(player, timeout_happened):
+        player.profit = calc_profit(player, player.expected_avg)
+
+    @staticmethod
     def vars_for_template(player: Player):
         group = player.group
+        return dict()
 
-        return dict(avg_history=avg_history(group))
 
+class Expect(Page):
+    form_model = 'player'
+    form_fields = ['redo']
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict()
+
+
+#Making duplicate pages
+class Second_Probability(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.redo
+
+    form_model = 'player'
+    form_fields = ['prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13']
+
+    @staticmethod
+    def error_message(player, values):
+        print('values is', values)
+        if values['prob7'] + values['prob8'] + values['prob9'] + values['prob10'] + values['prob11'] + values['prob12'] + values['prob13'] != 100:
+            return 'The numbers must add up to 100'
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        player.expected_avg = cu(7 * player.prob7 + 8 * player.prob8 + 9 * player.prob9 + 10 * player.prob10 + 11 * player.prob11 +
+                                 12 * player.prob12 + 13 * player.prob13) / 100
+
+
+class Second_Guess(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.redo
+
+    form_model = 'player'
+    form_fields = ['is_adjusted']
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        if not player.is_adjusted:
+            player.price = player.group.init_price
+            player.profit = calc_profit(player, player.expected_avg)
+
+
+class Second_Guess2(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.redo & player.is_adjusted
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        player.profit = calc_profit(player, player.expected_avg)
+
+    form_model = 'player'
+    form_fields = ['price']
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict()
+
+
+class Second_Expect(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.redo
+
+    form_model = 'player'
+    form_fields = ['redo']
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict()
 
 
 class ResultsWaitPage(WaitPage):
@@ -144,8 +242,23 @@ class Results(Page):
         group = player.group
 
         sorted_prices = sorted(p.price for p in group.get_players())
-        return dict(sorted_prices=sorted_prices,
-                    profit = calc_profit(player))
+        return dict(price = player.price,
+                    profit = player.profit,
+                    group_avg = player.group.avg,
+                    group_cost = player.group.cost,
+                    sorted_prices = sorted_prices)
 
 
-page_sequence = [Introduction, Guess, Guess2, ResultsWaitPage, Results]
+page_sequence = [Introduction,
+                 Probability, Guess, Guess2, Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 ResultsWaitPage, Results]

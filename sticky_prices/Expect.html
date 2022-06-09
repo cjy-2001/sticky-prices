@@ -1,0 +1,17 @@
+{{ block title }}Expected Profit{{ endblock }}
+{{ block content }}
+
+    <p>
+        Based on your expection, the average price will be {{ player.expected_avg }};
+        {{ if player.is_adjusted }}
+            If you adjust the price to {{ player.price }}, your profit will be {{ player.profit }}.
+        {{ else }}
+            If you keep the initial price of {{ player.price }}, your profit will be {{ player.profit }}.
+        {{ endif }}
+    </p>
+
+    <p>Do you wish to change your expections or price?</p>
+    <button name="redo" value="True">Yes</button>
+    <button name="redo" value="False">No</button>
+
+{{ endblock }}

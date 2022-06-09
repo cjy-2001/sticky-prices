@@ -6,7 +6,7 @@ SESSION_CONFIGS = [
         name='sticky_prices',
         display_name="Stikcy Prices Experiment",
         app_sequence=['sticky_prices', 'payment_info'],
-        num_demo_participants=3,
+        num_demo_participants=3
     ),
 ]
 
@@ -28,7 +28,7 @@ LANGUAGE_CODE = 'en'
 
 # e.g. EUR, GBP, CNY, JPY
 REAL_WORLD_CURRENCY_CODE = 'USD'
-USE_POINTS = True
+USE_POINTS = False
 
 ROOMS = [
     dict(
@@ -44,7 +44,7 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = environ.get('OTREE_ADMIN_PASSWORD')
 
 DEMO_PAGE_INTRO_HTML = """
-Here are some oTree games.
+Here is a behavior experiment for studying the sticky prices theory.
 """
 
 

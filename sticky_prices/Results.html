@@ -14,7 +14,11 @@
     </p>
 
     <p>
-        Your selected price was {{ player.price }}, and your profit was {{ profit }}.
+        {{ if player.is_adjusted }}
+            You adjusted the price to {{ player.price }}, and your profit was {{ player.profit }}.
+        {{ else }}
+            Your kept the initial price of {{ player.price }}, and your profit was {{ player.profit }}.
+        {{ endif }}
     </p>
 
 
