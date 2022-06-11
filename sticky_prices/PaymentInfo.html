@@ -1,0 +1,23 @@
+{{ block title }}Thank you{{ endblock }}
+{{ block content }}
+
+    <p>
+        <em>Thank you very much for your input on this experiment!</em>
+    </p>
+
+    <!--
+    <div class="panel panel-default" style="margin-bottom:10px">
+        <div class="panel-body">
+            <p><b>Laboratory:</b></p>
+            <p>Please remain seated until your number is called. Then take your number card, and proceed to the cashier.</p>
+            <p><em>Note: For the cashier in the laboratory, oTree can print a list of payments for all participants as a PDF.</em></p>
+        </div>
+    </div>
+    -->
+
+    <b>
+        Your completion code is: {{C.COMPLETION_CODE}}. And you will receive {{ earnings }}!
+    </b>
+
+
+{{ endblock }}

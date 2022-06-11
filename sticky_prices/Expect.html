@@ -4,7 +4,7 @@
     <p>
         Based on your expection, the average price will be {{ player.expected_avg }};
         {{ if player.is_adjusted }}
-            If you adjust the price to {{ player.price }}, your profit will be {{ player.profit }}.
+            If you adjust the price to {{ player.price }}, your profit will be {{ player.expected_profit }}.
         {{ else }}
             If you keep the initial price of {{ player.price }}, your profit will be {{ player.profit }}.
         {{ endif }}

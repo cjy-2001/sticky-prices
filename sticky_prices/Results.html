@@ -1,13 +1,6 @@
 {{ block title }}Results{{ endblock }}
 {{ block content }}
 
-    <!--<p>Here were the prices chosen:</p>
-
-    <p>
-        {{ sorted_prices }}
-    </p>
-    -->
-
     <p>
         The average price is {{ group.avg }};
         the best price was {{ group.best_price }}, and the corresponding highest profit is {{ group.best_profit }}.
@@ -21,22 +14,9 @@
         {{ endif }}
     </p>
 
-
-    <!--
     <p>
-        {{ if player.is_winner }}
-            {{ if group.num_winners > 1 }}
-                Therefore, you are one of the {{ group.num_winners }} winners
-                who tied for the best price.
-            {{ else }}
-                Therefore, you win!
-            {{ endif }}
-        {{ else }}
-            Therefore, you did not win.
-        {{ endif }}
-    Your payoff is {{ player.payoff }}.
+        Now your accumulated earnings is {{ player_earnings }}.
     </p>
-    -->
 
     {{ next_button }}
 
