@@ -2,21 +2,138 @@
 {{ block content }}
 
     <p>
-        The experiment will be a sequence of one-shot pricing games, where each round players(firms) all start at a common price.
-        You will be informed of how marginal costs will change and can decide if and how you would like to adjust your prices.
-        You will be given the new production cost and other information to help you make the decision.
-    </p>
-
-    <p>
         <em>
-          Your goal is to get the highest profit.
+          Welcome to our economics experiment!
         </em>
+    </p>
 
+
+    <b style="font-size:140%;"> General Idea </b>
+    <p>
+        In this experiment you will act as a seller.
+        Each period you will produce fictitious items, call them widgets, and you must decide what price to charge.
+        The profits you earn for selling your widgets depends on the price you set, the price your competitors set,
+        and the costs you incur for producing the widgets.
+        There will be {{ other_members }} other sellers participating in the market with you.
+        The demand for the widgets is automated (determined by the computer, not humans) and depends on the prices in the market.
     </p>
 
     <p>
-        Now you are in a group of {{ C.PLAYERS_PER_GROUP }} people, and this game will be played for {{ C.NUM_ROUNDS }} rounds.
+        You will choose prices in a series of XX rounds.
+        Each of these rounds are “one-shot” games, meaning that decisions you make in a previous round do no impact decisions or profits you can make in later rounds.
     </p>
+
+
+    <b style="font-size:140%;"> Decisions </b>
+    <p>
+        In each round you will begin with an old price of {{ group.init_price }}.
+        Call this yesterday’s price.
+        Yesterday’s cost of producing a widget was {{ group.cost }}.
+        In each round you will be notified of a change in your production cost.
+        When your production cost falls it will be cheaper for you to produce the widgets,
+        and, similarly, when your production cost rises it will be more expensive for you to produce the widgets.
+        With these new production costs, you will decide what you would like your new price to be.
+        You can leave your price at {{ group.init_price }} or change it to whatever level you like.
+        Note that it’s possible that leaving your price at yesterday’s price of {{ group.init_price }} may be the best thing to do.
+        All the other sellers in the market will face the same changes in production costs.
+    </p>
+
+
+    <b style="font-size:140%;"> Profits </b>
+    <p>
+        The profits you earn in each round are determined by your price, your production cost, the average price set in the market,
+        and if you incur a cost associated with changing your price from {{ group.init_price }}.
+        The profits you earn in each round will be determined by:
+    </p>
+
+    <p>
+        <em>Profit = (Your price – new production cost)*Demand – (cost to change prices)</em>
+    </p>
+
+    <p>
+        The Demand for your widgets will decrease as you raise your price and it will increase as the average price in the market increases.
+        Specifically, the Demand for your widgets is given by:
+    </p>
+
+    <p>
+        <em>Demand = {{ group.alpha }} – {{ group.beta }}*(Your Price)+ {{ group.theta }}*(Average price in market)</em>
+    </p>
+
+    <p>
+        To help you make the best decisions, the experiment will include a profit calculator with these equations (more on this below).
+    </p>
+
+
+    <b style="font-size:140%;"> Prices of other sellers </b>
+    <p>
+        As highlighted above, your profits will, in part, be determined by the pricing decisions of the other sellers in the market.
+        You will not know the others’ decisions until after you make your own price choice.
+        Therefore, to guide your pricing decision, it’s important to think about how the other sellers in the market will behave.
+        To aid you in this process, the experiment will include a table where you will enter how likely it is that the average price in the market will take some value.
+        Below are two examples.
+    </p>
+
+    <p>
+        <em>Belief Example 1.</em>
+    </p>
+    <table class="table">
+  <tr>
+    <th>Average Price</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>Total Probability Percentage (must sum to 100)</th>
+  </tr>
+  <tr>
+    <td>Probability</td><td>0</td><td>0</td><td>0</td><td>50</td><td>50</td><td>0</td><td>0</td><td>100</td>
+  </tr>
+    </table>
+
+    <p>
+        <em>Belief Example 2.</em>
+    </p>
+    <table class="table">
+  <tr>
+    <th>Average Price</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>Total Probability Percentage (must sum to 100)</th>
+  </tr>
+  <tr>
+    <td>Probability</td><td>0</td><td>100</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100</td>
+  </tr>
+    </table>
+
+    <p>
+        In each round you will enter in values in the “Probability” row.
+        These will be your beliefs about the probability that the average price will take a value in the “Average Price” row.
+        In Belief Example 1, this seller believes that in this period there is a 50% chance the average price in the market will be $10,
+        and a 50% change the average price in the market will be $11 (thus they believe the mean price in the market will be $10.5) .
+        Note that the sum of the probabilities you enter must sum to 1 (computed for you in the “Total Probability” column).
+    </p>
+
+    <p>
+        In Belief Example 2, this seller believes that there is a 100% chance the average price in the market will be $8,
+        i.e. that all sellers will choose a price of $8.
+    </p>
+
+
+    <b style="font-size:140%;"> Cost to Change Prices </b>
+    <p>
+        In each round, if you decide to change your price you will incur a price adjustment cost of {{ group.adjust_cost }}.
+        The profit calculator detailed above will incorporate this price adjustment cost when it computes your expected profit associated with changing your price.
+        These price adjustment costs are the reason that changing your price in a Round may not always be the best thing to do.
+    </p>
+
+
+    <b style="font-size:140%;"> Other sellers in your market </b>
+    <p>
+        In each round, you will be randomly (and anonymously) matched with other sellers into groups of {{ C.PLAYERS_PER_GROUP }}.
+        This random matching will occur at the start of each Round.
+        Therefore, the other sellers in the market with you may, or may not, be the same as those who were in your market in the previous Round.
+    </p>
+
+
+    <b style="font-size:140%;"> Earnings </b>
+    <p>
+        In the experiment you will begin with {{ C.START_EARNINGS }}.
+        For the {{ C.NUM_ROUNDS }} rounds in the experiment, we will tally your earnings (or loses) and add (subtract) these values from your initial {{ C.START_EARNINGS }}.
+        You will be anonymously paid this value at the completion of the experiment.
+    </p>
+
 
     {{ next_button }}
 

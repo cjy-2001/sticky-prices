@@ -11,7 +11,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 1
+    PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 3
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -20,10 +20,11 @@ class C(BaseConstants):
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
     INIT_PRODUCT_COST = [cu(9.2)] * NUM_ROUNDS
     NEW_PRODUCT_COST = ([cu(8.7), cu(10.7), cu(8.7)])
-    ALPHA = [cu(9)] * NUM_ROUNDS
-    THETA = [cu(1.8)] * NUM_ROUNDS
-    BETA = [cu(2.5)] * NUM_ROUNDS
+    ALPHA = [9.2] * NUM_ROUNDS
+    THETA = [1.8] * NUM_ROUNDS
+    BETA = [2.5] * NUM_ROUNDS
     ADJUST_COST = [cu(3)] * NUM_ROUNDS
+    START_EARNINGS = cu(15)
 
 
 class Subsession(BaseSubsession):
@@ -38,9 +39,9 @@ class Group(BaseGroup):
 
     init_price = models.CurrencyField()
     cost = models.CurrencyField()
-    alpha = models.CurrencyField()
-    theta = models.CurrencyField()
-    beta = models.CurrencyField()
+    alpha = models.FloatField()
+    theta = models.FloatField()
+    beta = models.FloatField()
     adjust_cost = models.CurrencyField()
 
 
@@ -106,6 +107,23 @@ class Introduction(Page):
     def is_displayed(player: Player):
         return player.round_number == 1
 
+    def vars_for_template(player: Player):
+        group = player.group
+        other_members = C.PLAYERS_PER_GROUP - 1
+        return dict(player_expected_avg=player.expected_avg,
+                    player_expected_profit=player.expected_profit,
+                    player_price=player.price,
+                    player_profit=player.profit,
+                    player_adjusted=player.is_adjusted,
+                    player_redo=player.redo,
+                    player_earnings=(earnings_history(player) + C.START_EARNINGS),
+
+                    group_avg=player.group.avg,
+                    group_cost=player.group.cost,
+                    group_init_price=player.group.init_price,
+
+                    other_members=other_members
+                    )
 
 class Probability(Page):
     form_model = 'player'
@@ -131,7 +149,7 @@ class Probability(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -158,7 +176,7 @@ class Guess(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -187,7 +205,7 @@ class Guess2(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -212,7 +230,7 @@ class Expect(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -249,7 +267,7 @@ class Second_Probability(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -280,7 +298,7 @@ class Second_Guess(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -309,7 +327,7 @@ class Second_Guess2(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -337,7 +355,7 @@ class Second_Expect(Page):
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
                     player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+15),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -361,7 +379,7 @@ class Results(Page):
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
                     player_redo = player.redo,
-                    player_earnings=(earnings_history(player)+15+player.profit),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS+player.profit),
 
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,
