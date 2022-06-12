@@ -11,7 +11,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 1
     NUM_ROUNDS = 3
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -55,7 +55,10 @@ class Player(BasePlayer):
     prob13 = models.IntegerField(min=0, max=100, label="$13:",initial=0)
     expected_avg = models.CurrencyField(initial=0)
     expected_profit = models.CurrencyField(initial=0)
-    price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, label="Please enter your new price:", initial=0)
+    expected_init_profit = models.CurrencyField(initial=0)
+    price = models.CurrencyField(
+        min=cu(0), max=C.PRICE_MAX, label="Please enter your new price:", initial=0
+    )
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
     redo = models.BooleanField(initial=False)
@@ -97,8 +100,23 @@ def calc_profit(player: Player, group_avg):
         return gross_profit
 
 
+def calc_init_profit(player: Player, group_avg):
+    gross_profit = cu((player.group.init_price - player.group.cost) * \
+                      (player.group.alpha - player.group.beta * player.group.init_price + player.group.theta * group_avg))
+
+    return gross_profit
+
+
 def earnings_history(player: Player):
     return sum(p.profit for p in player.in_previous_rounds())
+
+
+def custom_export(players):
+    # header row
+    yield ['participant_code', 'round_number', 'id_in_group', 'expected_avg', 'price', 'payoff']
+    for p in players:
+        participant = p.participant
+        yield [participant.code, p.round_number, p.id_in_group, p.expected_avg, p.price, p.payoff]
 
 
 # PAGES
@@ -112,6 +130,7 @@ class Introduction(Page):
         other_members = C.PLAYERS_PER_GROUP - 1
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -145,6 +164,7 @@ class Probability(Page):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -166,12 +186,14 @@ class Guess(Page):
         if not player.is_adjusted:
             player.price = player.group.init_price
             player.expected_profit = calc_profit(player, player.expected_avg)
+            player.expected_init_profit = calc_init_profit(player, player.expected_avg)
 
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -195,12 +217,14 @@ class Guess2(Page):
     @staticmethod
     def before_next_page(player, timeout_happened):
         player.expected_profit = calc_profit(player, player.expected_avg)
+        player.expected_init_profit = calc_init_profit(player, player.expected_avg)
 
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -226,6 +250,7 @@ class Expect(Page):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -263,6 +288,7 @@ class Second_Probability(Page):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -288,12 +314,14 @@ class Second_Guess(Page):
         if not player.is_adjusted:
             player.price = player.group.init_price
             player.expected_profit = calc_profit(player, player.expected_avg)
+            player.expected_init_profit = calc_init_profit(player, player.expected_avg)
 
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -314,6 +342,7 @@ class Second_Guess2(Page):
     @staticmethod
     def before_next_page(player, timeout_happened):
         player.expected_profit = calc_profit(player, player.expected_avg)
+        player.expected_init_profit = calc_init_profit(player, player.expected_avg)
 
     form_model = 'player'
     form_fields = ['price']
@@ -323,6 +352,7 @@ class Second_Guess2(Page):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -351,6 +381,7 @@ class Second_Expect(Page):
         group = player.group
         return dict(player_expected_avg=player.expected_avg,
                     player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_adjusted=player.is_adjusted,
@@ -375,6 +406,7 @@ class Results(Page):
         sorted_prices = sorted(p.price for p in group.get_players())
         return dict(player_expected_avg = player.expected_avg,
                     player_expected_profit = player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
                     player_price = player.price,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,

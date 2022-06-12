@@ -2,11 +2,34 @@
 {{ block content }}
 
     <p>
-        Based on your expection, the average price will be {{ player.expected_avg }};
+        Based on your expection, the average price will be {{ player.expected_avg }}:
+    </p>
+
+    <p>
         {{ if player.is_adjusted }}
-            If you adjust the price to {{ player.price }}, your profit will be {{ player.expected_profit }}.
+            <table class="table">
+                <tr>
+                    <th>If you:</th><th></th><th>Expected profit</th>
+                </tr>
+                <tr>
+                    <td>Change price to:</td><td>{{ player.price }}</td><td>{{ player.expected_profit }}</td>
+                </tr>
+                <tr>
+                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td>{{ player.expected_init_profit }}</td>
+                </tr>
+            </table>
         {{ else }}
-            If you keep the initial price of {{ player.price }}, your profit will be {{ player.profit }}.
+            <table class="table">
+                <tr>
+                    <th>If you:</th><th></th><th>Expected profit</th>
+                </tr>
+                <tr>
+                    <td>Change price to:</td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td>{{ player.expected_init_profit }}</td>
+                </tr>
+            </table>
         {{ endif }}
     </p>
 
