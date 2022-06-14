@@ -4,14 +4,13 @@ from otree.api import *
 doc = """
 Sticky prices experiment based on oTree.
 Players will play as different firms and decide if they will change their prices given an upcoming cost shock; 
-whoever gets the highest profit wins.
 Served as a real-life experiment to test the Nominal Rigidity (or sticky prices) theory.
 See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 """
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 1
+    PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 3
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -33,10 +32,6 @@ class Subsession(BaseSubsession):
 
 class Group(BaseGroup):
     avg = models.CurrencyField(initial=-1)
-    best_price = models.CurrencyField()
-    best_profit = models.CurrencyField()
-    num_winners = models.IntegerField()
-
     init_price = models.CurrencyField()
     cost = models.CurrencyField()
     alpha = models.FloatField()
@@ -62,6 +57,7 @@ class Player(BasePlayer):
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
     redo = models.BooleanField(initial=False)
+    reprice = models.BooleanField(initial=False)
 
 
 # FUNCTIONS
@@ -71,11 +67,6 @@ def set_payoffs(group: Group):
     group.avg = sum(prices) / len(players)
     for p in players:
         p.profit = calc_profit(p, group.avg)
-    profits = [p.profit for p in players]
-    group.best_profit = max(profits)
-    best_player = max(players, key=lambda player: player.profit)
-    group.best_price = best_player.price
-    for p in players:
         p.payoff = p.profit
 
 
@@ -144,6 +135,7 @@ class Introduction(Page):
                     other_members=other_members
                     )
 
+
 class Probability(Page):
     form_model = 'player'
     form_fields = ['prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13']
@@ -158,65 +150,6 @@ class Probability(Page):
     def before_next_page(player, timeout_happened):
         player.expected_avg = cu(7 * player.prob7 + 8 * player.prob8 + 9 * player.prob9 + 10 * player.prob10 + 11 * player.prob11 +
                                  12 * player.prob12 + 13 * player.prob13) / 100
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-
-class Guess(Page):
-    form_model = 'player'
-    form_fields = ['is_adjusted']
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        if not player.is_adjusted:
-            player.price = player.group.init_price
-            player.expected_profit = calc_profit(player, player.expected_avg)
-            player.expected_init_profit = calc_init_profit(player, player.expected_avg)
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-
-class Guess2(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return player.is_adjusted
-
-    form_model = 'player'
-    form_fields = ['price']
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        player.expected_profit = calc_profit(player, player.expected_avg)
         player.expected_init_profit = calc_init_profit(player, player.expected_avg)
 
     @staticmethod
@@ -237,13 +170,53 @@ class Guess2(Page):
                     )
 
 
+class SetPrice(Page):
+
+    form_model = 'player'
+    form_fields = ['price']
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        player.expected_profit = calc_profit(player, player.expected_avg)
+
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict(player_expected_avg=player.expected_avg,
+                    player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
+                    player_price=player.price,
+                    player_profit=player.profit,
+                    player_adjusted=player.is_adjusted,
+                    player_redo=player.redo,
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
+
+                    group_avg=player.group.avg,
+                    group_cost=player.group.cost,
+                    group_init_price=player.group.init_price,
+                    )
+
+    @staticmethod
+    def js_vars(player):
+        return dict(
+            cost=player.group.cost,
+            alpha=player.group.alpha,
+            beta=player.group.beta,
+            theta=player.group.theta,
+            avg=player.expected_avg,
+            adjust_cost=player.group.adjust_cost
+        )
+
+
 class Expect(Page):
     form_model = 'player'
     form_fields = ['redo']
 
     @staticmethod
     def before_next_page(player, timeout_happened):
-        pass
+        if player.price != player.group.init_price:
+            player.is_adjusted = True
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -264,7 +237,7 @@ class Expect(Page):
 
 
 #Making duplicate pages
-class Second_Probability(Page):
+class SecondProbability(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.redo
@@ -301,48 +274,16 @@ class Second_Probability(Page):
                     )
 
 
-class Second_Guess(Page):
+class SecondSetPrice(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.redo
-
-    form_model = 'player'
-    form_fields = ['is_adjusted']
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        if not player.is_adjusted:
-            player.price = player.group.init_price
-            player.expected_profit = calc_profit(player, player.expected_avg)
-            player.expected_init_profit = calc_init_profit(player, player.expected_avg)
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-
-class Second_Guess2(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return player.redo & player.is_adjusted
 
     @staticmethod
     def before_next_page(player, timeout_happened):
         player.expected_profit = calc_profit(player, player.expected_avg)
         player.expected_init_profit = calc_init_profit(player, player.expected_avg)
+
 
     form_model = 'player'
     form_fields = ['price']
@@ -364,8 +305,19 @@ class Second_Guess2(Page):
                     group_init_price=player.group.init_price,
                     )
 
+    @staticmethod
+    def js_vars(player):
+        return dict(
+            cost=player.group.cost,
+            alpha=player.group.alpha,
+            beta=player.group.beta,
+            theta=player.group.theta,
+            avg=player.expected_avg,
+            adjust_cost=player.group.adjust_cost
+        )
 
-class Second_Expect(Page):
+
+class SecondExpect(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.redo
@@ -374,7 +326,8 @@ class Second_Expect(Page):
     form_fields = ['redo']
 
     def before_next_page(player, timeout_happened):
-        pass
+        if player.price != player.group.init_price:
+            player.is_adjusted = True
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -422,15 +375,17 @@ class Results(Page):
 
 
 page_sequence = [Introduction,
-                 Probability, Guess, Guess2, Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
-                 Second_Probability, Second_Guess, Second_Guess2, Second_Expect,
+                 Probability, SetPrice, Expect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
+                 SecondProbability, SecondSetPrice, SecondExpect,
                  ResultsWaitPage, Results]
+
+#1. Change probability 2. Change price 3. Adjust price to 4. Keep the initital

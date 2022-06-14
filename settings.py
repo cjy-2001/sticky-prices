@@ -6,7 +6,7 @@ SESSION_CONFIGS = [
         name='sticky_prices',
         display_name="Stikcy Prices Experiment",
         app_sequence=['sticky_prices', 'payment_info'],
-        num_demo_participants=1
+        num_demo_participants=2
     ),
 ]
 
@@ -36,7 +36,7 @@ ROOMS = [
         display_name='Econ Experiment',
         participant_label_file='_rooms/econ101.txt',
     ),
-    dict(name='live_demo', display_name='Room for live demo (no participant labels)'),
+    dict(name='live_demo', display_name='Real Experiment (no participant labels)'),
 ]
 
 ADMIN_USERNAME = 'admin'

@@ -1,0 +1,20 @@
+{{ block title }}Your Decision{{ endblock }}
+{{ block content }}
+
+    {{ include C.INSTRUCTIONS_TEMPLATE }}
+
+    <p>
+        Before making your decision, you are welcome to enter your expections on the average price.
+        For example, if you beleive such price is impossible, you can enter 0; if you think it is definitely such price,
+        then you can enter 100.
+    </p>
+
+    <p>
+        Note: please enter the value as probability <em>percentage</em>, which means each value can range from 0 to 100,
+        and the sum of those probability percentages should be equal to 100.
+    </p>
+
+    {{ formfields }}
+    {{ next_button }}
+
+{{ endblock }}
