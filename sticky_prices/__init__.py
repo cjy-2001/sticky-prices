@@ -11,14 +11,14 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 class C(BaseConstants):
     PLAYERS_PER_GROUP = 2
-    NUM_ROUNDS = 3
+    NUM_ROUNDS = 2
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
     PRICE_MAX = cu(100)
 
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
     INIT_PRODUCT_COST = [cu(9.2)] * NUM_ROUNDS
-    NEW_PRODUCT_COST = ([cu(8.7), cu(10.7), cu(8.7)])
+    NEW_PRODUCT_COST = ([cu(8.7), cu(10.7)])
     ALPHA = [9.2] * NUM_ROUNDS
     THETA = [1.8] * NUM_ROUNDS
     BETA = [2.5] * NUM_ROUNDS
@@ -41,23 +41,21 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    prob7 = models.IntegerField(min=0, max=100, label="$7:",initial=0)
-    prob8 = models.IntegerField(min=0, max=100, label="$8:",initial=0)
-    prob9 = models.IntegerField(min=0, max=100, label="$9:",initial=0)
-    prob10 = models.IntegerField(min=0, max=100, label="$10:",initial=0)
-    prob11 = models.IntegerField(min=0, max=100, label="$11:",initial=0)
-    prob12 = models.IntegerField(min=0, max=100, label="$12:",initial=0)
-    prob13 = models.IntegerField(min=0, max=100, label="$13:",initial=0)
+    prob6 = models.IntegerField(initial=0)
+    prob7 = models.IntegerField(initial=0)
+    prob8 = models.IntegerField(initial=0)
+    prob9 = models.IntegerField(initial=0)
+    prob10 = models.IntegerField(initial=0)
+    prob11 = models.IntegerField(initial=0)
+    prob12 = models.IntegerField(initial=0)
+    prob13 = models.IntegerField(initial=0)
+    prob14 = models.IntegerField(initial=0)
     expected_avg = models.CurrencyField(initial=0)
     expected_profit = models.CurrencyField(initial=0)
     expected_init_profit = models.CurrencyField(initial=0)
-    price = models.CurrencyField(
-        min=cu(0), max=C.PRICE_MAX, label="Please enter your new price:", initial=0
-    )
+    price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=0)
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
-    redo = models.BooleanField(initial=False)
-    reprice = models.BooleanField(initial=False)
 
 
 # FUNCTIONS
@@ -104,10 +102,14 @@ def earnings_history(player: Player):
 
 def custom_export(players):
     # header row
-    yield ['participant_code', 'round_number', 'id_in_group', 'expected_avg', 'price', 'payoff']
+    yield ['participant_code', 'round_number',
+           '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
+           'expected_avg', 'price', 'payoff']
     for p in players:
         participant = p.participant
-        yield [participant.code, p.round_number, p.id_in_group, p.expected_avg, p.price, p.payoff]
+        yield [participant.code, p.round_number,
+               p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
+               p.expected_avg, p.price, p.payoff]
 
 
 # PAGES
@@ -124,56 +126,29 @@ class Introduction(Page):
                     player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player) + C.START_EARNINGS),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS+player.profit),
+                    play_adjusted=player.is_adjusted,
+                    prob6=player.prob6,
+                    prob7=player.prob7,
+                    prob8=player.prob8,
+                    prob9=player.prob9,
+                    prob10=player.prob10,
+                    prob11=player.prob11,
+                    prob12=player.prob12,
+                    prob13=player.prob13,
+                    prob14=player.prob14,
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
                     group_init_price=player.group.init_price,
-
-                    other_members=other_members
-                    )
-
-
-class Probability(Page):
-    form_model = 'player'
-    form_fields = ['prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13']
-
-    @staticmethod
-    def error_message(player, values):
-        print('values is', values)
-        if values['prob7'] + values['prob8'] + values['prob9'] + values['prob10'] + values['prob11'] + values['prob12'] + values['prob13'] != 100:
-            return 'The numbers must add up to 100'
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        player.expected_avg = cu(7 * player.prob7 + 8 * player.prob8 + 9 * player.prob9 + 10 * player.prob10 + 11 * player.prob11 +
-                                 12 * player.prob12 + 13 * player.prob13) / 100
-        player.expected_init_profit = calc_init_profit(player, player.expected_avg)
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
+                    other_members=C.PLAYERS_PER_GROUP-1
                     )
 
 
 class SetPrice(Page):
 
     form_model = 'player'
-    form_fields = ['price']
+    form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'price']
 
     @staticmethod
     def before_next_page(player, timeout_happened):
@@ -188,9 +163,17 @@ class SetPrice(Page):
                     player_expected_init_profit=player.expected_init_profit,
                     player_price=player.price,
                     player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS+player.profit),
+                    play_adjusted=player.is_adjusted,
+                    prob6=player.prob6,
+                    prob7=player.prob7,
+                    prob8=player.prob8,
+                    prob9=player.prob9,
+                    prob10=player.prob10,
+                    prob11=player.prob11,
+                    prob12=player.prob12,
+                    prob13=player.prob13,
+                    prob14=player.prob14,
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -207,144 +190,6 @@ class SetPrice(Page):
             avg=player.expected_avg,
             adjust_cost=player.group.adjust_cost
         )
-
-
-class Expect(Page):
-    form_model = 'player'
-    form_fields = ['redo']
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        if player.price != player.group.init_price:
-            player.is_adjusted = True
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-
-#Making duplicate pages
-class SecondProbability(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return player.redo
-
-    form_model = 'player'
-    form_fields = ['prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13']
-
-    @staticmethod
-    def error_message(player, values):
-        print('values is', values)
-        if values['prob7'] + values['prob8'] + values['prob9'] + values['prob10'] + values['prob11'] + values['prob12'] + values['prob13'] != 100:
-            return 'The numbers must add up to 100'
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        player.expected_avg = cu(7 * player.prob7 + 8 * player.prob8 + 9 * player.prob9 + 10 * player.prob10 + 11 * player.prob11 +
-                                 12 * player.prob12 + 13 * player.prob13) / 100
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-
-class SecondSetPrice(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return player.redo
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        player.expected_profit = calc_profit(player, player.expected_avg)
-        player.expected_init_profit = calc_init_profit(player, player.expected_avg)
-
-
-    form_model = 'player'
-    form_fields = ['price']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
-
-    @staticmethod
-    def js_vars(player):
-        return dict(
-            cost=player.group.cost,
-            alpha=player.group.alpha,
-            beta=player.group.beta,
-            theta=player.group.theta,
-            avg=player.expected_avg,
-            adjust_cost=player.group.adjust_cost
-        )
-
-
-class SecondExpect(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return player.redo
-
-    form_model = 'player'
-    form_fields = ['redo']
-
-    def before_next_page(player, timeout_happened):
-        if player.price != player.group.init_price:
-            player.is_adjusted = True
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        group = player.group
-        return dict(player_expected_avg=player.expected_avg,
-                    player_expected_profit=player.expected_profit,
-                    player_expected_init_profit=player.expected_init_profit,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_adjusted=player.is_adjusted,
-                    player_redo=player.redo,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS),
-
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    )
 
 
 class ResultsWaitPage(WaitPage):
@@ -356,14 +201,44 @@ class Results(Page):
     def vars_for_template(player: Player):
         group = player.group
 
-        sorted_prices = sorted(p.price for p in group.get_players())
+        return dict(player_expected_avg = player.expected_avg,
+                    player_expected_profit=player.expected_profit,
+                    player_expected_init_profit=player.expected_init_profit,
+                    player_price=player.price,
+                    player_profit=player.profit,
+                    player_earnings=(earnings_history(player)+C.START_EARNINGS+player.profit),
+                    play_adjusted=player.is_adjusted,
+                    prob6=player.prob6,
+                    prob7=player.prob7,
+                    prob8=player.prob8,
+                    prob9=player.prob9,
+                    prob10=player.prob10,
+                    prob11=player.prob11,
+                    prob12=player.prob12,
+                    prob13=player.prob13,
+                    prob14=player.prob14,
+
+                    group_avg=player.group.avg,
+                    group_cost=player.group.cost,
+                    group_init_price=player.group.init_price,
+                    )
+
+
+class ThankYou(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+
         return dict(player_expected_avg = player.expected_avg,
                     player_expected_profit = player.expected_profit,
                     player_expected_init_profit=player.expected_init_profit,
                     player_price = player.price,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
-                    player_redo = player.redo,
                     player_earnings=(earnings_history(player)+C.START_EARNINGS+player.profit),
 
                     group_avg = player.group.avg,
@@ -372,20 +247,4 @@ class Results(Page):
                     )
 
 
-
-
-page_sequence = [Introduction,
-                 Probability, SetPrice, Expect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 SecondProbability, SecondSetPrice, SecondExpect,
-                 ResultsWaitPage, Results]
-
-#1. Change probability 2. Change price 3. Adjust price to 4. Keep the initital
+page_sequence = [Introduction, SetPrice, ResultsWaitPage, Results, ThankYou]

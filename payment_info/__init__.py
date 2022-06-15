@@ -36,4 +36,4 @@ class PaymentInfo(Page):
         return dict(redemption_code=participant.label or participant.code)
 
 
-page_sequence = [PaymentInfo]
+page_sequence = []

@@ -1,12 +1,109 @@
 {{ block title }}Your Decision{{ endblock }}
 {{ block content }}
 
-
     {{ include C.INSTRUCTIONS_TEMPLATE }}
 
-    <p>
-        Based on your expection, the average price will be {{ player.expected_avg }}. Now you can use this slider to enter your new price and see expected profit.
-    </p>
+    <br>
+
+    <div>
+        <p>
+            Before making your decision, you are welcome to enter your expections on the average price.
+            Please enter the value as probability <em>percentage</em>, which means each value can range from 0 to 100,
+            and the sum of those probability percentages should be equal to 100.
+        </p>
+
+        <br>
+
+        {{ formfield_errors 'prob6'}}
+        {{ formfield_errors 'prob7'}}
+        {{ formfield_errors 'prob8'}}
+        {{ formfield_errors 'prob9'}}
+        {{ formfield_errors 'prob10'}}
+        {{ formfield_errors 'prob11'}}
+        {{ formfield_errors 'prob12'}}
+        {{ formfield_errors 'prob13'}}
+        {{ formfield_errors 'prob14'}}
+
+        <div>
+            <label>$6:
+                   <input type="number" name="prob6" id='prob6' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$7:
+                   <input type="number" name="prob7" id='prob7' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$8:
+                   <input type="number" name="prob8" id='prob8' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$9:
+                   <input type="number" name="prob9" id='prob9' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$10:
+                   <input type="number" name="prob10" id='prob10' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$11:
+                   <input type="number" name="prob11" id='prob11' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$12:
+                   <input type="number" name="prob12" id='prob12' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$13:
+                   <input type="number" name="prob13" id='prob13' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+
+            <label>$14:
+                   <input type="number" name="prob14" id='prob14' min="0" max="100" value="0" oninput="calc_avg()">
+            </label>
+        </div>
+
+        <br>
+
+        <p id="expect_avg">
+            Based on your expection, the average price will be $0.00.
+        </p>
+
+        <script>
+            $(":input").bind('keyup mouseup', function () {
+            var p6=$("#prob6").val();
+            var p7=$("#prob7").val();
+            var p8=$("#prob8").val();
+            var p9=$("#prob9").val();
+            var p10=$("#prob10").val();
+            var p11=$("#prob11").val();
+            var p12=$("#prob12").val();
+            var p13=$("#prob13").val();
+            var p14=$("#prob14").val();
+
+            var total= parseInt(p6) + parseInt(p7) + parseInt(p8)  + parseInt(p9) + parseInt(p10) + parseInt(p11) + parseInt(p12) + parseInt(p13) + parseInt(p14);
+
+            if(total>100) {
+                alert("The sum of the probability percentages can't be greater than 100");
+                return false;
+              }
+            });
+
+            function calc_avg() {
+                let expected_avg = document.getElementById("expect_avg");
+                let player_expected_avg = (6 * parseInt(document.getElementById("prob6").value) + 7 * parseInt(document.getElementById("prob7").value)
+                + 8 * parseInt(document.getElementById("prob8").value) + 9 * parseInt(document.getElementById("prob9").value)
+                + 10 * parseInt(document.getElementById("prob10").value) + 11 * parseInt(document.getElementById("prob11").value)
+                + 12 * parseInt(document.getElementById("prob12").value) + 13 * parseInt(document.getElementById("prob13").value)
+                + 14 * parseInt(document.getElementById("prob14").value)) / 100;
+                player_expected_avg = player_expected_avg.toFixed(2);
+                expected_avg.innerText = `Based on your expection, the average price will be $${player_expected_avg}.`
+            }
+        </script>
+    </div>
+
+
+
+
 
     <style>
         input[name=price] {
@@ -50,7 +147,7 @@
         <tr>
             <th>If you:</th><th></th><th>Expected profit</th>
         </tr>
-        <tr id="somerow">
+        <tr id="final_profit">
             <td>Change price to:</td><td>{{ player.price }}</td><td>{{ player.expected_profit }}</td>
         </tr>
         <tr>
@@ -67,10 +164,10 @@
         let avg = js_vars.avg;
         let adjust_cost = js_vars.adjust_cost;
         function updateDescription(input) {
-            let Row = document.getElementById("somerow");
+            let Row = document.getElementById("final_profit");
             let Cells = Row.getElementsByTagName("td");
             let price = input.value;
-            let profit = (input.value - cost) * (alpha - beta * input.value + theta * avg) - adjust_cost;
+            let profit = (price - cost) * (alpha - beta * price+ theta * avg) - adjust_cost;
             profit = profit.toFixed(2);
             Cells[1].innerText = `$${price}`
             Cells[2].innerText = `$${profit}`
