@@ -1,6 +1,8 @@
-+ 7 * document.getElementById("prob7").value + 8 * document.getElementById("prob8").value
-                    + 9 * document.getElementById("prob9").value + 10 * document.getElementById("prob10").value + 11 * document.getElementById("prob11").value
-                    + 12 * document.getElementById("prob12").value + 13 * document.getElementById("prob13").value + 13 * document.getElementById("prob14").value)
+(6 * parseInt(document.getElementById("prob6").value) + 7 * parseInt(document.getElementById("prob7").value)
+                + 8 * parseInt(document.getElementById("prob8").value) + 9 * parseInt(document.getElementById("prob9").value)
+                + 10 * parseInt(document.getElementById("prob10").value) + 11 * parseInt(document.getElementById("prob11").value)
+                + 12 * parseInt(document.getElementById("prob12").value) + 13 * parseInt(document.getElementById("prob13").value)
+                + 14 * parseInt(document.getElementById("prob14").value)) / 100;
 
 
 

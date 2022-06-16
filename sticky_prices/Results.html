@@ -14,7 +14,11 @@
     </p>
 
     <p>
-        Now your accumulated earnings is {{ player_earnings }}.
+        {{ if subsession.is_practice_round }}
+            Now your accumulated earnings is {{ practice_earnings }}.
+        {{ else }}
+            Now your accumulated earnings is {{ player_earnings }}.
+        {{ endif}}
     </p>
 
     {{ next_button }}
