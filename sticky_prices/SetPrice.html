@@ -352,7 +352,7 @@
     <p>Do you wish to keep the initial price?</p>
 
     <button name="is_adjusted" value="False">Yes, I would like to keep the initial price of {{ group.init_price }}</button>
-    <button name="is_adjusted" value="True" id="adjust_button">No, I want to adjust my price</button>
+    <button name="is_adjusted" value="True" id="adjust_button">No, I want to adjust my price to {{ player.price }}.</button>
 
     <script>
         function update_button() {
