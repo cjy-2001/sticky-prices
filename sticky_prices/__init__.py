@@ -10,17 +10,16 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 1
+    NUM_REAL_ROUNDS = 10
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
     PRICE_MAX = cu(100)
 
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
-    INIT_PRODUCT_COST = [cu(9.2)] * NUM_ROUNDS
-    NEW_PRODUCT_COST = ([cu(8.7), cu(10.7)])
+    NEW_PRODUCT_COST = [cu(9.2), cu(8.7), cu(10.7), cu(9.7), cu(6.2), cu(8.2), cu(11.2), cu(12.2), cu(7.7), cu(10.2), cu(7.2)]
     ALPHA = [9.2] * NUM_ROUNDS
     THETA = [1.8] * NUM_ROUNDS
     BETA = [2.5] * NUM_ROUNDS
@@ -57,6 +56,22 @@ class Player(BasePlayer):
     price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=10)
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
+
+    quiz1 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
+                               label="If yesterday’s price is $10, then which of the following is true:")
+    quiz2 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. The buyers will want to buy more from me", "B. The buyers will want to buy less from me"],
+                               label="If you increase your price, then:")
+    quiz3 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. The buyers will want to buy more from me, since the other sellers seem like a worse deal", "B. The buyers will want to buy less from me"],
+                               label="If the average price in the market, due to the decisions of the other sellers, increase, then:")
+    quiz4 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. Enter two numbers of 100 in the 7's and 8's columns", "B. Enter two numbers of 50 in the 7's and 8's columns", "C. Enter two numbers of 1 in the 7's and 8's columns"],
+                               label="If you believed that there is a 50% chance that the market price will be 7 and a 50% chance that the market price will be 8, how would you indicate that in the probability table above?")
+    quiz5 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. The market price", "B. The price I set", "C. The cost of producing a widget", "D. All of the above"],
+                               label="Which of the following can affect you profit?")
 
 
 # FUNCTIONS
@@ -119,14 +134,27 @@ def custom_export(players):
 
 # PAGES
 class Introduction(Page):
+    form_model = 'player'
+    form_fields = ['quiz1', 'quiz2', 'quiz3', 'quiz4', 'quiz5']
+
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
+
+
+    @staticmethod
+    def error_message(player, values):
+        if values['quiz1'] != "C. I can keep my price at $10 or I can change it" or values['quiz2'] != "B. The buyers will want to buy less from me"\
+                or values['quiz3'] != "A. The buyers will want to buy more from me, since the other sellers seem like a worse deal"\
+                or values['quiz4'] != "B. Enter two numbers of 50 in the 7's and 8's columns" or values['quiz5'] != "D. All of the above":
+            return 'One or more answers to the quiz are incorrect, please try again.'
+
 
     def vars_for_template(player: Player):
         group = player.group
         practice_player = player.in_round(1)
         other_members = C.PLAYERS_PER_GROUP - 1
+
         return dict(player_expected_avg=player.expected_avg,
                     player_price=player.price,
                     player_profit=player.profit,
@@ -147,12 +175,18 @@ class Introduction(Page):
                     group_init_price=player.group.init_price,
                     other_members=C.PLAYERS_PER_GROUP-1,
 
-                    payoff=player.payoff
+                    payoff=player.payoff,
+
+                    quiz1='quiz1',
+                    quiz2='quiz2',
+                    quiz3='quiz3',
+                    quiz4='quiz4',
+                    quiz5='quiz5'
                     )
 
 
 class SetPrice(Page):
-    timeout_seconds = 20
+    timeout_seconds = 1800
     form_model = 'player'
     form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'price', 'expected_avg', 'is_adjusted']
 
@@ -164,7 +198,6 @@ class SetPrice(Page):
 
     @staticmethod
     def error_message(player, values):
-        print('values is', values)
         if values['prob6'] + values['prob7'] + values['prob8'] + values['prob9'] + values['prob10'] + values['prob11'] + values['prob12'] + values['prob13'] + values['prob14'] != 100:
             return 'The sum of probabilities must add up to 100'
 
@@ -173,26 +206,57 @@ class SetPrice(Page):
     def vars_for_template(player: Player):
         group = player.group
         practice_player = player.in_round(1)
-        return dict(player_expected_avg=player.expected_avg,
-                    player_price=player.price,
-                    player_profit=player.profit,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
-                    play_adjusted=player.is_adjusted,
-                    prob6=player.prob6,
-                    prob7=player.prob7,
-                    prob8=player.prob8,
-                    prob9=player.prob9,
-                    prob10=player.prob10,
-                    prob11=player.prob11,
-                    prob12=player.prob12,
-                    prob13=player.prob13,
-                    prob14=player.prob14,
+        first_round = player.round_number == 1
+        if not first_round:
+            prev_player = player.in_round(player.round_number - 1)
+            diff = abs(player.group.cost - prev_player.group.cost)
+            up = player.group.cost >= prev_player.group.cost
+            return dict(player_expected_avg=player.expected_avg,
+                        player_price=player.price,
+                        player_profit=player.profit,
+                        player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
+                        play_adjusted=player.is_adjusted,
+                        prob6=player.prob6,
+                        prob7=player.prob7,
+                        prob8=player.prob8,
+                        prob9=player.prob9,
+                        prob10=player.prob10,
+                        prob11=player.prob11,
+                        prob12=player.prob12,
+                        prob13=player.prob13,
+                        prob14=player.prob14,
 
-                    group_avg=player.group.avg,
-                    group_cost=player.group.cost,
-                    group_init_price=player.group.init_price,
-                    payoff=player.payoff
-                    )
+                        group_avg=player.group.avg,
+                        group_cost=player.group.cost,
+                        group_init_price=player.group.init_price,
+                        payoff=player.payoff,
+                        first_round=first_round,
+                        diff=diff,
+                        up=up
+                        )
+        else:
+            return dict(player_expected_avg=player.expected_avg,
+                        player_price=player.price,
+                        player_profit=player.profit,
+                        player_earnings=(earnings_history(player) + C.START_EARNINGS - practice_player.profit),
+                        play_adjusted=player.is_adjusted,
+                        prob6=player.prob6,
+                        prob7=player.prob7,
+                        prob8=player.prob8,
+                        prob9=player.prob9,
+                        prob10=player.prob10,
+                        prob11=player.prob11,
+                        prob12=player.prob12,
+                        prob13=player.prob13,
+                        prob14=player.prob14,
+
+                        group_avg=player.group.avg,
+                        group_cost=player.group.cost,
+                        group_init_price=player.group.init_price,
+                        payoff=player.payoff,
+                        first_round=first_round,
+                        )
+
 
     @staticmethod
     def js_vars(player):

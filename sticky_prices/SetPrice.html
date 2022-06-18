@@ -3,12 +3,36 @@
         Practice round {{ subsession.round_number }} of {{ C.NUM_PRACTICE_ROUNDS }}
     {{ else }}
         Round {{ subsession.real_round_number }} of {{ C.NUM_REAL_ROUNDS }}
-    {{ endif}}
+    {{ endif }}
 {{ endblock }}
 
 {{ block content }}
 
-    {{ include C.INSTRUCTIONS_TEMPLATE }}
+    <div>
+        <h4>
+            Instructions
+        </h4>
+
+        <p>
+            You are in a group of {{ C.PLAYERS_PER_GROUP }} people.
+            Each of you will be asked to choose if you decide to adjust your price.
+            Your goal is to get the highest profit.
+        </p>
+
+        <p>
+            {{ if first_round }}
+                In this round, your production cost has gone DOWN by $1, and is now $8.7.
+            {{ else }}
+                {{ if up }}
+                    In this round, your production cost has gone UP by {{ diff }}, and is now {{ group.cost }}.
+                {{ else }}
+                    In this round, your production cost has gone DOWN by {{ diff }}, and is now {{ group.cost }}.
+                {{ endif }}
+            {{ endif }}
+
+            You can decide if you want to adjust the inital price of {{ group.init_price }}.
+        </p>
+    </div>
 
     <br>
 
