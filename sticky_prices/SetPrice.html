@@ -8,6 +8,14 @@
 
 {{ block content }}
 
+{{ if subsession.is_practice_round }}
+    <p>
+        <em> Note: This is a practice round, so your profits this period will not impact your earnings in the experiment.</em>
+    </p>
+{{ endif }}
+
+<br>
+
     <div>
         <h4>
             Instructions
@@ -16,20 +24,26 @@
         <p>
             You are in a group of {{ C.PLAYERS_PER_GROUP }} people.
             Each of you will be asked to choose if you decide to adjust your price.
-            Your goal is to get the highest profit.
+            Your goal as an individual is to get the highest profit for yourself.
+        </p>
+
+        <p>
+            The cost to change your price is {{ group.adjust_cost }}.
         </p>
 
         <p>
             {{ if first_round }}
-                In this round, your production cost has gone DOWN by $1, and is now $8.7.
+                <b>In this round, your production cost has gone DOWN by $1, and is now $8.7.</b>
             {{ else }}
                 {{ if up }}
-                    In this round, your production cost has gone UP by {{ diff }}, and is now {{ group.cost }}.
+                    <b>In this round, your production cost has gone UP by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ else }}
-                    In this round, your production cost has gone DOWN by {{ diff }}, and is now {{ group.cost }}.
+                    <b>In this round, your production cost has gone DOWN by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ endif }}
             {{ endif }}
+        </p>
 
+        <p>
             You can decide if you want to adjust the inital price of {{ group.init_price }}.
         </p>
     </div>
@@ -42,9 +56,9 @@
         </h4>
 
         <p>
-            Before making your decision, you are welcome to enter your expections on the average price.
-            Please enter the value as probability <em>percentage</em>, which means each value can range from 0 to 100,
-            and the sum of those probability percentages should be equal to 100.
+            Before making your decision, you are welcome to enter your expectations of the average market price.
+            Please enter the value as probability <em>percentage</em>, so each value can range from 0 to 100,
+            and the sum of those probability percentages should be <em>exactly</em> 100.
         </p>
 
         <br>
@@ -61,39 +75,39 @@
 
         <div>
             <label>$6:
-                   <input type="number" name="prob6" id='prob6' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob6" id='prob6' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';" >
             </label>
 
             <label>$7:
-                   <input type="number" name="prob7" id='prob7' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob7" id='prob7' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$8:
-                   <input type="number" name="prob8" id='prob8' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob8" id='prob8' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$9:
-                   <input type="number" name="prob9" id='prob9' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob9" id='prob9' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$10:
-                   <input type="number" name="prob10" id='prob10' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob10" id='prob10' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$11:
-                   <input type="number" name="prob11" id='prob11' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob11" id='prob11' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$12:
-                   <input type="number" name="prob12" id='prob12' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob12" id='prob12' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$13:
-                   <input type="number" name="prob13" id='prob13' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob13" id='prob13' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$14:
-                   <input type="number" name="prob14" id='prob14' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();">
+                   <input type="number" name="prob14" id='prob14' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
         </div>
 
@@ -102,7 +116,7 @@
         <br>
 
         <p id="expect_avg">
-            Based on your expection, the average price will be $0.00.
+            Based on your inputs, the expected average market price will be $0.00.
         </p>
 
         <input type="hidden" name="expected_avg" id="expected_avg" />
@@ -135,7 +149,7 @@
                 + 12 * parseInt(document.getElementById("prob12").value) + 13 * parseInt(document.getElementById("prob13").value)
                 + 14 * parseInt(document.getElementById("prob14").value)) / 100;
                 player_expected_avg_2 = player_expected_avg.toFixed(2);
-                expected_avg.innerText = `Based on your expection, the average price will be $${player_expected_avg_2}.`
+                expected_avg.innerText = `Based on your inputs, the expected average market price will be $${player_expected_avg_2}.`
                 document.getElementById('expected_avg').value = player_expected_avg_2;
             }
         </script>
@@ -188,11 +202,7 @@
 
         {{ formfield_errors 'price' }}
 
-        <input type="range" name="price" id="setPrice" min="7" max="13" step="0.01" oninput="updateDescription(); update(); update_button();">
-
-        <p id="selected_price">
-            The initial price is {{ player.group.init_price }}.
-        </p>
+        <input type="range" name="price" id="setPrice" min="7" max="13" step="0.01" oninput="updateDescription(); update(); update_button();"  onkeydown="return event.key != 'Enter';">
 
         <script>
             function update() {
@@ -201,12 +211,12 @@
             }
         </script>
 
-        <br>
-
-        <br>
+        <p id="selected_price">
+            The initial price is {{ player.group.init_price }}.
+        </p>
 
         <p>
-            <em>Your Beliefs About the Average Price in the Market</em>
+            <em><font size="+1">Your Beliefs About the Average Price in the Market</font></em>
 
             <table class="table">
                 <tr>
@@ -247,7 +257,7 @@
         <p>
             <table id="description" class="table">
                 <tr>
-                    <th>Therefore, if you:</th><th></th><th>Expected profit</th>
+                    <th>Therefore, if you:</th><th></th><th>Your expected profit</th>
                 </tr>
                 <tr id="final_profit">
                     <td>Change price to:</td><td>{{ player.price }}</td><td>$0.00</td>
@@ -345,19 +355,15 @@
         Your Decision
     </h4>
 
-    <p>
-        After finding the best price, you can decide if you want to keep the initial price or adjust to a new price selected by the slider.
-    </p>
+    <p>Do you wish to adjust your price?</p>
 
-    <p>Do you wish to keep the initial price?</p>
-
-    <button name="is_adjusted" value="False">Yes, I would like to keep the initial price of {{ group.init_price }}</button>
-    <button name="is_adjusted" value="True" id="adjust_button">No, I want to adjust my price to {{ player.price }}.</button>
+    <button name="is_adjusted" value="True" id="adjust_button">Yes, I want to adjust my price to {{ player.price }}.</button>
+    <button name="is_adjusted" value="False">No, I would like to keep the initial price of {{ group.init_price }}.</button>
 
     <script>
         function update_button() {
             let price = document.getElementById("setPrice").value;
-            document.getElementById('adjust_button').innerText = `No, I want to adjust my price to $${price}.`;
+            document.getElementById('adjust_button').innerText = `Yes, I want to adjust my price to $${price}.`;
         }
     </script>
 

@@ -10,7 +10,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 1
     NUM_PRACTICE_ROUNDS = 1
     NUM_REAL_ROUNDS = 10
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
@@ -19,6 +19,7 @@ class C(BaseConstants):
     PRICE_MAX = cu(100)
 
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
+    INIT_COST = cu(9.2)
     NEW_PRODUCT_COST = [cu(9.2), cu(8.7), cu(10.7), cu(9.7), cu(6.2), cu(8.2), cu(11.2), cu(12.2), cu(7.7), cu(10.2), cu(7.2)]
     ALPHA = [9.2] * NUM_ROUNDS
     THETA = [1.8] * NUM_ROUNDS
@@ -56,6 +57,7 @@ class Player(BasePlayer):
     price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=10)
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
+    earnings = models.CurrencyField(initial=C.START_EARNINGS)
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
@@ -85,7 +87,9 @@ def set_payoffs(group: Group):
     for p in players:
         p.profit = calc_profit(p, group.avg)
         if not group.subsession.is_practice_round:
+            practice_player = p.in_round(1)
             p.payoff = p.profit
+            p.earnings += earnings_history(p) - practice_player.profit
 
 
 def creating_session(subsession):
@@ -124,12 +128,12 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'selected_price', 'profit per round']
+           'expected_avg', 'selected_price', 'profit per round', 'accumulated earnings (including $15)']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
                p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
-               p.expected_avg, p.price, p.payoff]
+               p.expected_avg, p.price, p.payoff, p.earnings]
 
 
 # PAGES
@@ -152,13 +156,12 @@ class Introduction(Page):
 
     def vars_for_template(player: Player):
         group = player.group
-        practice_player = player.in_round(1)
         other_members = C.PLAYERS_PER_GROUP - 1
 
         return dict(player_expected_avg=player.expected_avg,
                     player_price=player.price,
                     player_profit=player.profit,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
+                    player_earnings=player.earnings,
                     play_adjusted=player.is_adjusted,
                     prob6=player.prob6,
                     prob7=player.prob7,
@@ -186,7 +189,7 @@ class Introduction(Page):
 
 
 class SetPrice(Page):
-    timeout_seconds = 1800
+    timeout_seconds = 180
     form_model = 'player'
     form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'price', 'expected_avg', 'is_adjusted']
 
@@ -205,16 +208,17 @@ class SetPrice(Page):
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
-        practice_player = player.in_round(1)
         first_round = player.round_number == 1
         if not first_round:
-            prev_player = player.in_round(player.round_number - 1)
-            diff = abs(player.group.cost - prev_player.group.cost)
-            up = player.group.cost >= prev_player.group.cost
+            #prev_player = player.in_round(player.round_number - 1)
+            #diff = abs(player.group.cost - prev_player.group.cost)
+            #up = player.group.cost >= prev_player.group.cost
+            diff = abs(player.group.cost - C.INIT_COST)
+            up = player.group.cost >= C.INIT_COST
             return dict(player_expected_avg=player.expected_avg,
                         player_price=player.price,
                         player_profit=player.profit,
-                        player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
+                        player_earnings=player.earnings,
                         play_adjusted=player.is_adjusted,
                         prob6=player.prob6,
                         prob7=player.prob7,
@@ -238,7 +242,7 @@ class SetPrice(Page):
             return dict(player_expected_avg=player.expected_avg,
                         player_price=player.price,
                         player_profit=player.profit,
-                        player_earnings=(earnings_history(player) + C.START_EARNINGS - practice_player.profit),
+                        player_earnings=player.earnings,
                         play_adjusted=player.is_adjusted,
                         prob6=player.prob6,
                         prob7=player.prob7,
@@ -279,12 +283,11 @@ class Results(Page):
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
-        practice_player = player.in_round(1)
         practice_earnings = earnings_history(player)+C.START_EARNINGS
         return dict(player_expected_avg = player.expected_avg,
                     player_price=player.price,
                     player_profit=player.profit,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
+                    player_earnings=player.earnings,
                     play_adjusted=player.is_adjusted,
                     prob6=player.prob6,
                     prob7=player.prob7,
@@ -319,12 +322,11 @@ class ThankYou(Page):
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
-        practice_player = player.in_round(1)
         return dict(player_expected_avg = player.expected_avg,
                     player_price = player.price,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
-                    player_earnings=(earnings_history(player)+C.START_EARNINGS-practice_player.profit),
+                    player_earnings= player.earnings,
 
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,

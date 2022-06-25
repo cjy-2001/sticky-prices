@@ -4,8 +4,15 @@
 
 {{ block content }}
 
-    <p>Your practice round is over. Now you will have {{ C.NUM_REAL_ROUNDS }} rounds real games.</p>
+<p>
+    Your practice round is over.
+</p>
 
-    {{ next_button }}
+<p>
+    Now there will be {{ C.NUM_REAL_ROUNDS }} rounds that are paid.
+    Your decisions in these rounds will affect your earnings in the experiment.
+</p>
+
+{{ next_button }}
 
 {{ endblock }}
