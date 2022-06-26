@@ -75,7 +75,7 @@
 
         <div>
             <label>$6:
-                   <input type="number" name="prob6" id='prob6' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';" >
+                   <input type="number" name="prob6" id='prob6' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
             </label>
 
             <label>$7:
@@ -142,6 +142,51 @@
             });
 
             function calc_avg() {
+                if (document.getElementById("prob6").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob6").value = 0;
+                }
+
+                if (document.getElementById("prob7").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob7").value = 0;
+                }
+
+                if (document.getElementById("prob8").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob8").value = 0;
+                }
+
+                if (document.getElementById("prob9").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob9").value = 0;
+                }
+
+                if (document.getElementById("prob10").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob10").value = 0;
+                }
+
+                if (document.getElementById("prob11").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob11").value = 0;
+                }
+
+                if (document.getElementById("prob12").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob12").value = 0;
+                }
+
+                if (document.getElementById("prob13").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob13").value = 0;
+                }
+
+                if (document.getElementById("prob14").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob14").value = 0;
+                }
+
                 let expected_avg = document.getElementById("expect_avg");
                 let player_expected_avg = (6 * parseInt(document.getElementById("prob6").value) + 7 * parseInt(document.getElementById("prob7").value)
                 + 8 * parseInt(document.getElementById("prob8").value) + 9 * parseInt(document.getElementById("prob9").value)
@@ -236,6 +281,51 @@
 
         <script>
             function updateProb() {
+                if (document.getElementById("prob6").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob6").value = 0;
+                }
+
+                if (document.getElementById("prob7").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob7").value = 0;
+                }
+
+                if (document.getElementById("prob8").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob8").value = 0;
+                }
+
+                if (document.getElementById("prob9").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob9").value = 0;
+                }
+
+                if (document.getElementById("prob10").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob10").value = 0;
+                }
+
+                if (document.getElementById("prob11").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob11").value = 0;
+                }
+
+                if (document.getElementById("prob12").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob12").value = 0;
+                }
+
+                if (document.getElementById("prob13").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob13").value = 0;
+                }
+
+                if (document.getElementById("prob14").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob14").value = 0;
+                }
+
                 let Row = document.getElementById("probability");
                 let Cells = Row.getElementsByTagName("td");
                 let sum = parseInt(document.getElementById("prob6").value) + parseInt(document.getElementById("prob7").value) + parseInt(document.getElementById("prob8").value)
@@ -277,6 +367,51 @@
             let init_price = js_vars.init_price;
 
             function updateDescription() {
+                if (document.getElementById("prob6").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob6").value = 0;
+                }
+
+                if (document.getElementById("prob7").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob7").value = 0;
+                }
+
+                if (document.getElementById("prob8").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob8").value = 0;
+                }
+
+                if (document.getElementById("prob9").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob9").value = 0;
+                }
+
+                if (document.getElementById("prob10").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob10").value = 0;
+                }
+
+                if (document.getElementById("prob11").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob11").value = 0;
+                }
+
+                if (document.getElementById("prob12").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob12").value = 0;
+                }
+
+                if (document.getElementById("prob13").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob13").value = 0;
+                }
+
+                if (document.getElementById("prob14").value == "") {
+                    alert("You have to put a number in the probability box!")
+                    document.getElementById("prob14").value = 0;
+                }
+
                 let price = document.getElementById("setPrice").value;
 
                 //Row of profit from adjusting

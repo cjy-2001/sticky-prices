@@ -59,6 +59,9 @@ class Player(BasePlayer):
     is_adjusted = models.BooleanField(initial=False)
     earnings = models.CurrencyField(initial=C.START_EARNINGS)
 
+    timeout = models.BooleanField(initial=False)
+    start = models.FloatField(initial=0)
+
     quiz1 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
                                label="If yesterday’s price is $10, then which of the following is true:")
@@ -110,6 +113,7 @@ def creating_session(subsession):
         group.init_price = C.INIT_PRICE[subsession.round_number - 1]
 
 
+
 def calc_profit(player: Player, group_avg):
     gross_profit = cu((player.price - player.group.cost) * \
                        (player.group.alpha - player.group.beta * player.price + player.group.theta * group_avg))
@@ -128,12 +132,12 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'selected_price', 'profit per round', 'accumulated earnings (including $15)']
+           'expected_avg', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
                p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
-               p.expected_avg, p.price, p.payoff, p.earnings]
+               p.expected_avg, p.price, p.timeout, p.payoff, p.earnings]
 
 
 # PAGES
@@ -177,6 +181,7 @@ class Introduction(Page):
                     group_cost=player.group.cost,
                     group_init_price=player.group.init_price,
                     other_members=C.PLAYERS_PER_GROUP-1,
+                    start=player.start,
 
                     payoff=player.payoff,
 
@@ -188,6 +193,7 @@ class Introduction(Page):
                     )
 
 
+
 class SetPrice(Page):
     timeout_seconds = 180
     form_model = 'player'
@@ -197,6 +203,7 @@ class SetPrice(Page):
     def before_next_page(player, timeout_happened):
         if timeout_happened:
             player.price = 10
+            player.timeout = True
 
 
     @staticmethod
@@ -229,6 +236,8 @@ class SetPrice(Page):
                         prob12=player.prob12,
                         prob13=player.prob13,
                         prob14=player.prob14,
+                        timeout=player.timeout,
+                        start=player.start,
 
                         group_avg=player.group.avg,
                         group_cost=player.group.cost,
@@ -253,6 +262,7 @@ class SetPrice(Page):
                         prob12=player.prob12,
                         prob13=player.prob13,
                         prob14=player.prob14,
+                        timeout=player.timeout,
 
                         group_avg=player.group.avg,
                         group_cost=player.group.cost,
@@ -298,6 +308,8 @@ class Results(Page):
                     prob12=player.prob12,
                     prob13=player.prob13,
                     prob14=player.prob14,
+                    timeout=player.timeout,
+                    start=player.start,
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
