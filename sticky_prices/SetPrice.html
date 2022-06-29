@@ -33,12 +33,12 @@
 
         <p>
             {{ if first_round }}
-                <b>In this round, your production cost has gone DOWN by $1, and is now $8.7.</b>
+                <b>In this round, your production cost has gone DOWN from $9.2 by $0,5, and is now $8.7.</b>
             {{ else }}
                 {{ if up }}
-                    <b>In this round, your production cost has gone UP by {{ diff }}, and is now {{ group.cost }}.</b>
+                    <b>In this round, your production cost has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ else }}
-                    <b>In this round, your production cost has gone DOWN by {{ diff }}, and is now {{ group.cost }}.</b>
+                    <b>In this round, your production cost has gone DOWN from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ endif }}
             {{ endif }}
         </p>
@@ -57,7 +57,7 @@
 
         <p>
             Before making your decision, you are welcome to enter your expectations of the average market price.
-            Please enter the value as probability <em>percentage</em>, so each value can range from 0 to 100,
+            Please enter value as a probability (percentage), so each value can range from 0 to 100,
             and the sum of those probability percentages should be <em>exactly</em> 100.
         </p>
 
