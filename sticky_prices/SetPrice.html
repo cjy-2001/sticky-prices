@@ -344,16 +344,22 @@
             }
         </script>
 
+        <style type="text/css">
+            table td#changed_profit {border:solid 4px red}
+            table td#unchanged_profit {border:solid 4px red}
+            td {white-space:nowrap}
+        </style>
+
         <p>
-            <table id="description" class="table">
+            <table id="description" class="table" style="width:500px; margin-left:auto;margin-right:auto;">
                 <tr>
-                    <th>Therefore, if you:</th><th></th><th>Your expected profit</th>
+                    <th>Therefore, if you</th><th></th><th>Your expected profit </th>
                 </tr>
                 <tr id="final_profit">
-                    <td>Change price to:</td><td>{{ player.price }}</td><td>$0.00</td>
+                    <td style="width:200px">Change price to:</td><td style="width:120px">{{ player.price }}</td><td id="changed_profit">$0.00</td>
                 </tr>
                 <tr id="final_init_profit">
-                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td>$0.00</td>
+                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td id="unchanged_profit">$0.00</td>
                 </tr>
             </table>
         </p>
