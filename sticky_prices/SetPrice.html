@@ -33,7 +33,7 @@
 
         <p>
             {{ if first_round }}
-                <b>In this round, your production cost has gone DOWN from $9.2 by $0,5, and is now $8.7.</b>
+                <b>In this round, your production cost has gone DOWN from $9.2 by $0.5, and is now $8.7.</b>
             {{ else }}
                 {{ if up }}
                     <b>In this round, your production cost has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
@@ -111,18 +111,23 @@
             </label>
         </div>
 
-        <input type="hidden" name="prob6" id="prob6_2" />
-        <input type="hidden" name="prob7" id="prob7_2" />
-        <input type="hidden" name="prob8" id="prob8_2" />
-        <input type="hidden" name="prob9" id="prob9_2" />
-        <input type="hidden" name="prob10" id="prob10_2" />
-        <input type="hidden" name="prob11" id="prob11_2" />
-        <input type="hidden" name="prob12" id="prob12_2" />
-        <input type="hidden" name="prob13" id="prob13_2" />
-        <input type="hidden" name="prob14" id="prob14_2" />
+        <input type="hidden" name="prob6" id="prob6_2" value="0"/>
+        <input type="hidden" name="prob7" id="prob7_2" value="0"/>
+        <input type="hidden" name="prob8" id="prob8_2" value="0"/>
+        <input type="hidden" name="prob9" id="prob9_2" value="0"/>
+        <input type="hidden" name="prob10" id="prob10_2" value="0"/>
+        <input type="hidden" name="prob11" id="prob11_2" value="0"/>
+        <input type="hidden" name="prob12" id="prob12_2" value="0"/>
+        <input type="hidden" name="prob13" id="prob13_2" value="0"/>
+        <input type="hidden" name="prob14" id="prob14_2" value="0"/>
 
-        <script>
-        </script>
+<!--        <script>-->
+<!--                for (let i = 6; i <= 14; i++) {-->
+<!--                    if (document.getElementById('prob' + i).value == null) {-->
+<!--                        document.getElementById("prob" + i).value = 0;-->
+<!--                    }-->
+<!--                }-->
+<!--        </script>-->
 
         {{ formfield_errors 'expected_avg' }}
 

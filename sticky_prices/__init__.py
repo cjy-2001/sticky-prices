@@ -10,7 +10,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 1
+    PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
     NUM_REAL_ROUNDS = 10
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
@@ -44,23 +44,22 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    prob6 = models.IntegerField(initial=0)
-    prob7 = models.IntegerField(initial=0)
-    prob8 = models.IntegerField(initial=0)
-    prob9 = models.IntegerField(initial=0)
-    prob10 = models.IntegerField(initial=0)
-    prob11 = models.IntegerField(initial=0)
-    prob12 = models.IntegerField(initial=0)
-    prob13 = models.IntegerField(initial=0)
-    prob14 = models.IntegerField(initial=0)
-    expected_avg = models.CurrencyField(initial=0)
+    prob6 = models.IntegerField(initial=0, blank=True)
+    prob7 = models.IntegerField(initial=0, blank=True)
+    prob8 = models.IntegerField(initial=0, blank=True)
+    prob9 = models.IntegerField(initial=0, blank=True)
+    prob10 = models.IntegerField(initial=0, blank=True)
+    prob11 = models.IntegerField(initial=0, blank=True)
+    prob12 = models.IntegerField(initial=0, blank=True)
+    prob13 = models.IntegerField(initial=0, blank=True)
+    prob14 = models.IntegerField(initial=0, blank=True)
+    expected_avg = models.CurrencyField(initial=0, blank=True)
     price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=10)
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
     earnings = models.CurrencyField()
 
     timeout = models.BooleanField(initial=False)
-    start = models.FloatField(initial=0)
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
@@ -70,13 +69,13 @@ class Player(BasePlayer):
                                label="If you increase your price, then:")
     quiz3 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The buyers will want to buy more from me, since the other sellers seem like a worse deal", "B. The buyers will want to buy less from me"],
-                               label="If the average price in the market, due to the decisions of the other sellers, increase, then:")
+                               label="If the average price in the market increases, due to the decisions of the other sellers, then:")
     quiz4 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. Enter two numbers of 100 in the 7's and 8's columns", "B. Enter two numbers of 50 in the 7's and 8's columns", "C. Enter two numbers of 1 in the 7's and 8's columns"],
                                label="If you believed that there is a 50% chance that the market price will be 7 and a 50% chance that the market price will be 8, how would you indicate that in the probability table above?")
     quiz5 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The market price", "B. The price I set", "C. The cost of producing a widget", "D. All of the above"],
-                               label="Which of the following can affect you profit?")
+                               label="Which of the following can affect your profit?")
 
 
 # FUNCTIONS
@@ -183,7 +182,6 @@ class Introduction(Page):
                     group_cost=player.group.cost,
                     group_init_price=player.group.init_price,
                     other_members=C.PLAYERS_PER_GROUP-1,
-                    start=player.start,
 
                     payoff=player.payoff,
 
@@ -238,7 +236,6 @@ class SetPrice(Page):
                         prob13=player.prob13,
                         prob14=player.prob14,
                         timeout=player.timeout,
-                        start=player.start,
 
                         group_avg=player.group.avg,
                         group_cost=player.group.cost,
@@ -285,11 +282,20 @@ class SetPrice(Page):
         )
 
 
-class ResultsWaitPage(WaitPage):
+class ResultsWaitPage1(WaitPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
+class ResultsWaitPage2(WaitPage):
     after_all_players_arrive = set_payoffs
 
 
 class Results(Page):
+    timeout_seconds = 20    
+    timer_text = "Time left to advance to the next page:"
+
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
@@ -309,7 +315,6 @@ class Results(Page):
                     prob13=player.prob13,
                     prob14=player.prob14,
                     timeout=player.timeout,
-                    start=player.start,
 
                     group_avg=player.group.avg,
                     group_cost=player.group.cost,
@@ -347,4 +352,4 @@ class ThankYou(Page):
                     )
 
 
-page_sequence = [Introduction, SetPrice, ResultsWaitPage, Results, PracticeFeedback, ThankYou]
+page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, PracticeFeedback, ResultsWaitPage1, ThankYou]
