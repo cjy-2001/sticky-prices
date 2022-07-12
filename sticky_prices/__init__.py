@@ -57,6 +57,7 @@ class Player(BasePlayer):
     price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=cu(0))
     slider_price = models.CurrencyField(min=cu(6), max=cu(14), initial=cu(10))
     profit = models.CurrencyField(initial=0)
+    sec_profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
     earnings = models.CurrencyField()
 
@@ -64,7 +65,7 @@ class Player(BasePlayer):
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
-                               label="If yesterday’s price is $10, then which of the following is true:")
+                               label="If yesterday’s price is $10, which of the following is true:")
     quiz2 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The buyers will want to buy more from me", "B. The buyers will want to buy less from me"],
                                label="If you increase your price, then:")
@@ -73,7 +74,7 @@ class Player(BasePlayer):
                                label="If the average price in the market increases, due to the decisions of the other sellers, then:")
     quiz4 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. Enter two numbers of 100 in the 7's and 8's columns", "B. Enter two numbers of 50 in the 7's and 8's columns", "C. Enter two numbers of 1 in the 7's and 8's columns"],
-                               label="If you believed that there is a 50% chance that the market price will be 7 and a 50% chance that the market price will be 8, how would you indicate that in the probability table above?")
+                               label="If you believe that there is a 50% chance that the market price will be 7 and a 50% chance that the market price will be 8, how would you indicate that in the probability table above?")
     quiz5 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The market price", "B. The price I set", "C. The cost of producing a widget", "D. All of the above"],
                                label="Which of the following can affect your profit?")
@@ -94,6 +95,11 @@ def set_payoffs(group: Group):
     group.avg = sum(prices) / len(players)
     for p in players:
         p.profit = calc_profit(p, group.avg)
+        if p.is_adjusted:
+            p.sec_profit = sec_calc_profit(p, group.avg)
+        else:
+            p.sec_profit = thi_calc_profit(p, group.avg)
+
         if not group.subsession.is_practice_round:
             practice_player = p.in_round(1)
             p.payoff = p.profit
@@ -130,6 +136,20 @@ def calc_profit(player: Player, group_avg):
         return gross_profit - player.group.adjust_cost
     else:
         return gross_profit
+
+
+def sec_calc_profit(player: Player, group_avg):
+    gross_profit = cu((player.group.init_price - player.group.cost) * \
+                       (player.group.alpha - player.group.beta * player.group.init_price + player.group.theta * group_avg))
+
+    return gross_profit
+
+
+def thi_calc_profit(player: Player, group_avg):
+    gross_profit = cu((player.slider_price - player.group.cost) * \
+                       (player.group.alpha - player.group.beta * player.slider_price + player.group.theta * group_avg))
+
+    return gross_profit - player.group.adjust_cost
 
 
 def earnings_history(player: Player):

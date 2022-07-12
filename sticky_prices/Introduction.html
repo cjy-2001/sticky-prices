@@ -13,7 +13,7 @@
     <p>
         In this experiment you will act as a seller.
         Each period you will produce fictitious items, call them widgets, and you must decide what price to charge.
-        The profits you earn for selling your widgets depends on the price you set, the price your competitors set,
+        The profits you earn for selling your widgets depend on the price you set, the price your competitors set,
         and the costs you incur for producing the widgets.
         There will be {{ other_members }} other sellers participating in the market with you.
         The demand for the widgets is automated (determined by the computer, not humans) and depends on the prices in the market.
@@ -37,7 +37,7 @@
         With these new production costs, you will decide what you would like your new price to be.
         You can leave your price at {{ group.init_price }} or change it to whatever level you like.
         Note that it’s possible that leaving your price at yesterday’s price of {{ group.init_price }} may be the best thing to do.
-        All the other sellers in the market will face the same changes in production costs.
+        <b>All the other sellers in the market will face the same changes in production costs as you do.</b>
     </p>
 
     <div>
@@ -116,7 +116,7 @@
     </table>
 
     <p>
-        In each round you will enter in values in the “Probability” row.
+        In each round you will enter values in the “Probability” row.
         These will be your beliefs about the probability that the average price will take a value in the “Average Price” row.
         In Belief Example 1, this seller believes that in this period there is a 50% chance the average price in the market will be $10,
         and a 50% change the average price in the market will be $11 (thus they believe the mean price in the market will be $10.5) .
@@ -126,6 +126,10 @@
     <p>
         In Belief Example 2, this seller believes that there is a 100% chance the average price in the market will be $8,
         i.e. that all sellers will choose a price of $8.
+    </p>
+
+    <p>
+        <em>You can change the probabilities you enter as many times as you like during a round.</em>
     </p>
 
     <div>
@@ -138,7 +142,7 @@
     <b style="font-size:140%;"> Profit Calculator </b>
     <p>
         Using the beliefs you enter about the average price in the market, you will then be able to experiment with different values for your price.
-        Moving the price slider will take these different candidate prices and compute your expected profit.
+        Moving the price slider will take these different hypothetical prices and compute your expected profit.
         As an example, if your price slider is currently at $11 the computer will calculate your profit associated with this price of $11.
     </p>
 
@@ -160,6 +164,7 @@
     <p>
         In Profit Example 1, the computer is showing you that if you change your price to $11 you should expect to lose $2.28 in this round.
         Alternatively, it also shows you that if you leave your price at $10, you should expect to earn $2.32 in this round.
+        It is important to emphasize that these calculations are computed using your beliefs about what the average price in the market will be.
         Thus, conditional on your beliefs and costs of selling the widgets, you would be best to leave your price at $10 in this round.
     </p>
 

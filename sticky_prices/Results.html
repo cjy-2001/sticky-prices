@@ -8,8 +8,10 @@
     <p>
         {{ if player.is_adjusted }}
             You adjusted the price to {{ player.price }}, and your profit was {{ player.profit }}.
+            If you keep the initial price of {{ group.init_price }}, your profit will be {{ player.sec_profit }}.
         {{ else }}
             Your kept the initial price of {{ player.price }}, and your profit was {{ player.profit }}.
+            If you adjust the price to {{ player.slider_price }}, your profit will be {{ player.sec_profit }}.
         {{ endif }}
     </p>
 
