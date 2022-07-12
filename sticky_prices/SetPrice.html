@@ -33,7 +33,7 @@
 
         <p>
             {{ if first_round }}
-                <b>In this round, your production cost has gone DOWN from $9.2 by $0.5, and is now $8.7.</b>
+                <b>In this round, your production cost has gone DOWN from $9.20 by $0.50, and is now $8.70.</b>
             {{ else }}
                 {{ if up }}
                     <b>In this round, your production cost has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
@@ -228,7 +228,7 @@
         </p>
 
         <style>
-            input[name=price] {
+            input[name=slider_price] {
               -webkit-appearance: none;
               width: 100%;
               height: 15px;
@@ -240,17 +240,17 @@
               transition: opacity .2s;
             }
 
-            input[name=price] {
+            input[name=slider_price] {
                 -webkit-appearance: none;
                 margin: 18px 0;
                 width: 100%;
             }
 
-            input[name=price]:hover {
+            input[name=slider_price]:hover {
                 opacity: 1; /* Fully shown on mouse-over */
             }
 
-             input[name=price]::-webkit-slider-thumb {
+             input[name=slider_price]::-webkit-slider-thumb {
               -webkit-appearance: none;
               appearance: none;
               width: 25px;
@@ -261,9 +261,17 @@
             }
         </style>
 
-        {{ formfield_errors 'price' }}
+        {{ formfield_errors 'slider_price' }}
 
-        <input type="range" name="price" id="setPrice" min="7" max="13" step="0.01" oninput="updateDescription(); update(); update_button();"  onkeydown="return event.key != 'Enter';">
+        <input type="range" name="slider_price" id="setPrice" min="7" max="13" step="0.01" oninput="updateDescription(); update(); update_button();"  onkeydown="return event.key != 'Enter';">
+
+        <script>
+            let xyz = js_vars.init_price;
+            xyz = xyz.toFixed(2);
+            $(document).ready(function() {
+                $("#setPrice").val(xyz);
+            });
+        </script>
 
         <script>
             function update() {
@@ -273,7 +281,10 @@
         </script>
 
         <p id="selected_price">
-            The initial price is {{ player.group.init_price }}.
+              <script type="text/javascript">
+                var z = document.getElementById("setPrice").value;
+              </script>
+            The initial price is $<script type="text/javascript">document.write(z)</script>.00.
         </p>
 
         <p>
@@ -328,12 +339,12 @@
         </style>
 
         <p>
-            <table id="description" class="table" style="width:500px; margin-left:auto;margin-right:auto;">
+            <table id="description" class="table" style="width:750px; margin-left:auto;margin-right:auto;">
                 <tr>
-                    <th>Therefore, if you</th><th></th><th id="expected_profit">Your Expected Profit</th>
+                    <th>Therefore, if you</th><th></th><th id="expected_profit">Your Expected Profit (computed based on your belief)</th>
                 </tr>
                 <tr id="final_profit">
-                    <td style="width:200px">Change price to:</td><td style="width:120px">{{ player.price }}</td><td id="changed_profit">$0.00</td>
+                    <td style="width:200px">Change price to:</td><td style="width:120px">{{ player.slider_price }}</td><td id="changed_profit">$0.00</td>
                 </tr>
                 <tr id="final_init_profit">
                     <td>Keep price at:</td><td>{{ group.init_price }}</td><td id="unchanged_profit">$0.00</td>
@@ -429,7 +440,7 @@
                 //     + profitNonAdjust10 * parseInt(document.getElementById("prob10").value) + profitNonAdjust11 * parseInt(document.getElementById("prob11").value)
                 //     + profitNonAdjust12 * parseInt(document.getElementById("prob12").value) + profitNonAdjust13 * parseInt(document.getElementById("prob13").value)
                 //     + profitNonAdjust14 * parseInt(document.getElementById("prob14").value))/100).toFixed(2);
-                Cells_init_non[1].innerText = `$${init_price}`
+                Cells_init_non[1].innerText = `$10.00`
                 Cells_init_non[2].innerText = `$${expected_init_profit}`
             }
         </script>
@@ -444,8 +455,8 @@
 
     <p>Do you wish to adjust your price?</p>
 
-    <button name="is_adjusted" value="True" id="adjust_button" style="width:300px; text-align:left;">Yes, I want to adjust my price to {{ player.price }}.</button>
-    <button name="is_adjusted" value="False" style="width:380px">No, I would like to keep the initial price of {{ group.init_price }}.</button>
+    <button name="is_adjusted" value="True" id="adjust_button" style="width:300px; text-align:left;">Yes, I want to adjust my price to {{ player.slider_price }}.</button>
+    <button name="is_adjusted" value="False" style="width:335px; text-align:left;">No, I'd like to keep the initial price of {{ group.init_price }}.</button>
 
     <script>
         function update_button() {

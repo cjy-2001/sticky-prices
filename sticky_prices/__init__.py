@@ -10,7 +10,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
     NUM_REAL_ROUNDS = 10
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
@@ -20,7 +20,7 @@ class C(BaseConstants):
 
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
     INIT_COST = cu(9.2)
-    NEW_PRODUCT_COST = [cu(9.2), cu(8.7), cu(10.7), cu(9.7), cu(6.2), cu(8.2), cu(11.2), cu(12.2), cu(7.7), cu(10.2), cu(7.2)]
+    NEW_PRODUCT_COST = [cu(8.7), cu(8.7), cu(10.7), cu(9.7), cu(6.2), cu(8.2), cu(11.2), cu(12.2), cu(7.7), cu(10.2), cu(7.2)]
     ALPHA = [9.2] * NUM_ROUNDS
     THETA = [1.8] * NUM_ROUNDS
     BETA = [2.5] * NUM_ROUNDS
@@ -54,7 +54,8 @@ class Player(BasePlayer):
     prob13 = models.IntegerField(initial=0, blank=True)
     prob14 = models.IntegerField(initial=0, blank=True)
     expected_avg = models.CurrencyField(initial=0, blank=True)
-    price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=10)
+    price = models.CurrencyField(min=cu(0), max=C.PRICE_MAX, initial=cu(0))
+    slider_price = models.CurrencyField(min=cu(6), max=cu(14), initial=cu(10))
     profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
     earnings = models.CurrencyField()
@@ -82,8 +83,13 @@ class Player(BasePlayer):
 def set_payoffs(group: Group):
     players = group.get_players()
     for p in players:
+        p.price = p.slider_price
         if not p.is_adjusted:
             p.price = p.group.init_price
+        if p.price == p.group.init_price:
+            p.is_adjusted = False
+        else:
+            p.is_adjusted = True
     prices = [p.price for p in players]
     group.avg = sum(prices) / len(players)
     for p in players:
@@ -134,12 +140,12 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)']
+           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
                p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
-               p.expected_avg, p.price, p.timeout, p.payoff, p.earnings]
+               p.expected_avg, p.slider_price, p.price, p.timeout, p.payoff, p.earnings]
 
 
 # PAGES
@@ -197,12 +203,12 @@ class Introduction(Page):
 class SetPrice(Page):
     timeout_seconds = 180
     form_model = 'player'
-    form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'price', 'expected_avg', 'is_adjusted']
+    form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'slider_price', 'expected_avg', 'is_adjusted']
 
     @staticmethod
     def before_next_page(player, timeout_happened):
         if timeout_happened:
-            player.price = 10
+            player.price = cu(10)
             player.timeout = True
 
 
@@ -224,6 +230,7 @@ class SetPrice(Page):
             up = player.group.cost >= C.INIT_COST
             return dict(player_expected_avg=player.expected_avg,
                         player_price=player.price,
+                        player_slider_price=player.slider_price,
                         player_profit=player.profit,
                         play_adjusted=player.is_adjusted,
                         prob6=player.prob6,
@@ -247,6 +254,7 @@ class SetPrice(Page):
                         )
         else:
             return dict(player_expected_avg=player.expected_avg,
+                        player_slider_price=player.slider_price,
                         player_price=player.price,
                         player_profit=player.profit,
                         play_adjusted=player.is_adjusted,
@@ -301,6 +309,7 @@ class Results(Page):
         group = player.group
         practice_earnings = earnings_history(player)
         return dict(player_expected_avg = player.expected_avg,
+                    player_slider_price=player.slider_price,
                     player_price=player.price,
                     player_profit=player.profit,
                     player_earnings=player.earnings,
@@ -340,6 +349,7 @@ class ThankYou(Page):
     def vars_for_template(player: Player):
         group = player.group
         return dict(player_expected_avg = player.expected_avg,
+                    player_slider_price=player.slider_price,
                     player_price = player.price,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
