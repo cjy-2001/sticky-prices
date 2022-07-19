@@ -37,7 +37,7 @@
         With these new production costs, you will decide what you would like your new price to be.
         You can leave your price at {{ group.init_price }} or change it to whatever level you like.
         Note that it’s possible that leaving your price at yesterday’s price of {{ group.init_price }} may be the best thing to do.
-        <b>All the other sellers in the market will face the same changes in production costs as you do.</b>
+        <b>All the other sellers in the market will face the same production costs as you do.</b>
     </p>
 
     <div>
@@ -48,6 +48,15 @@
     <br>
 
     <b style="font-size:140%;"> Profits </b>
+
+    <p>
+        <em>Cost: the production cost you incur per widget</em>
+    </p>
+
+    <p>
+        <em>Price: the amount of money buyers pay to you per widget</em>
+    </p>
+
     <p>
         The profits you earn in each round are determined by your price, your production cost, the average price set in the market,
         and if you incur a cost associated with changing your price from {{ group.init_price }}.
@@ -205,7 +214,7 @@
     <p>
         In each round, if you decide to change your price you will incur a price adjustment cost of {{ group.adjust_cost }}.
         The profit calculator detailed above will incorporate this price adjustment cost when it computes your expected profit associated with changing your price.
-        These price adjustment costs are the reason that changing your price in a Round may not always be the best thing to do.
+        These price adjustment costs are the reason that changing your price in a round may not always be the best thing to do.
     </p>
 
     <br>
