@@ -6,7 +6,7 @@ SESSION_CONFIGS = [
         name='sticky_prices',
         display_name="Sticky Prices Experiment",
         app_sequence=['sticky_prices'],
-        num_demo_participants=5
+        num_demo_participants=2
     ),
 ]
 

@@ -28,17 +28,17 @@
         </p>
 
         <p>
-            The cost to change your price is {{ group.adjust_cost }}.
+            The fee to change your price is {{ group.adjust_cost }}.
         </p>
 
         <p>
             {{ if first_round }}
-                <b>In this round, your production cost has gone DOWN from $9.20 by $0.50, and is now $8.70.</b>
+                <b>In this round, everyone's production cost (including yours) has gone DOWN from $9.20 by $1.25, and is now $10.45.</b>
             {{ else }}
                 {{ if up }}
-                    <b>In this round, your production cost has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
+                    <b>In this round, everyone's production cost (including yours) has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ else }}
-                    <b>In this round, your production cost has gone DOWN from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
+                    <b>In this round, everyone's production cost (including yours) has gone DOWN from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
                 {{ endif }}
             {{ endif }}
         </p>

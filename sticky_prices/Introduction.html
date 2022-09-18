@@ -28,9 +28,9 @@
 
     <b style="font-size:140%;"> Decisions </b>
     <p>
-        In each round you will begin with an old price of {{ group.init_price }}.
+        In each round you will begin with an old sale price of {{ group.init_price }}.
         Call this yesterday’s price.
-        Yesterday’s cost of producing a widget was {{ group.cost }}.
+        Yesterday’s production cost of a widget was {{ group.cost }}.
         In each round you will be notified of a change in your production cost.
         When your production cost falls it will be cheaper for you to produce the widgets,
         and, similarly, when your production cost rises it will be more expensive for you to produce the widgets.
@@ -102,7 +102,7 @@
     </p>
     <table class="table">
   <tr>
-    <th>Average Price</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>Total Probability Percentage (must sum to 100)</th>
+    <th>Average Price</th><th>$7</th><th>$8</th><th>$9</th><th>$10</th><th>$11</th><th>$12</th><th>$13</th><th>Total Probability Percentage (must sum to 100)</th>
   </tr>
   <tr>
     <td>Probability</td><td>0</td><td>0</td><td>0</td><td>50</td><td>50</td><td>0</td><td>0</td><td>100</td>
@@ -114,7 +114,7 @@
     </p>
     <table class="table">
   <tr>
-    <th>Average Price</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>Total Probability Percentage (must sum to 100)</th>
+    <th>Average Price</th><th>$7</th><th>$8</th><th>$9</th><th>$10</th><th>$11</th><th>$12</th><th>$13</th><th>Total Probability Percentage (must sum to 100)</th>
   </tr>
   <tr>
     <td>Probability</td><td>0</td><td>100</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100</td>
@@ -124,14 +124,15 @@
     <p>
         In each round you will enter values in the “Probability” row.
         These will be your beliefs about the probability that the average price will take a value in the “Average Price” row.
-        In Belief Example 1, this seller believes that in this period there is a 50% chance the average price in the market will be $10,
-        and a 50% change the average price in the market will be $11 (thus they believe the mean price in the market will be $10.5) .
+        In Belief Example 1, this seller believes that in this period there is a 50% chance the average price in the market will be $10.00,
+        and a 50% change the average price in the market will be $11.00 (thus they believe the mean price in the market will be $10.50) .
         Note that the sum of the probabilities you enter must sum to 1 (computed for you in the “Total Probability” column).
     </p>
 
     <p>
-        In Belief Example 2, this seller believes that there is a 100% chance the average price in the market will be $8,
-        i.e. that all sellers will choose a price of $8.
+        In Belief Example 2, this seller believes that there is a 100% chance the average price in the market will be $8.00,
+        i.e. they are certain that all sellers will choose a price of $8.00.
+        Anywhere a “0” appears in the table indicates they are certain that market price will not occur.
     </p>
 
     <p>
@@ -149,7 +150,7 @@
     <p>
         Using the beliefs you enter about the average price in the market, you will then be able to experiment with different values for your price.
         Moving the price slider will take these different hypothetical prices and compute your expected profit.
-        As an example, if your price slider is currently at $11 the computer will calculate your profit associated with this price of $11.
+        As an example, if your price slider is currently at $11.00 the computer will calculate your profit associated with this price of $11.00.
     </p>
 
     <p>
@@ -160,18 +161,18 @@
             <th>If you:</th><th></th><th>Your expected profit</th>
         </tr>
         <tr>
-            <td>Change price to:</td><td>$11</td><td>-$2.28</td>
+            <td>Change price to:</td><td>$11.00</td><td>-$2.28</td>
         </tr>
         <tr>
-            <td>Keep price at:</td><td>$10</td><td>$2.32</td>
+            <td>Keep price at:</td><td>$10.00</td><td>$2.32</td>
         </tr>
     </table>
 
     <p>
-        In Profit Example 1, the computer is showing you that if you change your price to $11 you should expect to lose $2.28 in this round.
-        Alternatively, it also shows you that if you leave your price at $10, you should expect to earn $2.32 in this round.
+        In Profit Example 1, the computer is showing you that if you change your price to $11.00 you should expect to lose $2.28 in this round.
+        Alternatively, it also shows you that if you leave your price at $10.00, you should expect to earn $2.32 in this round.
         It is important to emphasize that these calculations are computed using your beliefs about what the average price in the market will be.
-        Thus, conditional on your beliefs and costs of selling the widgets, you would be best to leave your price at $10 in this round.
+        Thus, conditional on your beliefs and costs of selling the widgets, you would be best to leave your price at $10.00 in this round.
     </p>
 
     <p>
@@ -182,16 +183,16 @@
             <th>If you:</th><th></th><th>Your expected profit</th>
         </tr>
         <tr>
-            <td>Change price to:</td><td>$12.6</td><td>$0.44</td>
+            <td>Change price to:</td><td>$12.60</td><td>$0.44</td>
         </tr>
         <tr>
-            <td>Keep price at:</td><td>$10</td><td>-$7.4</td>
+            <td>Keep price at:</td><td>$10.00</td><td>-$7.40</td>
         </tr>
     </table>
 
     <p>
-        In Profit Example 2, the computer is showing you that if you change your price to $12.6 you should expect to earn $0.44 in this round.
-        Alternatively, it also shows you that if you leave your price at $10, you should expect to lose $7.4 in this round.
+        In Profit Example 2, the computer is showing you that if you change your price to $12.60 you should expect to earn $0.44 in this round.
+        Alternatively, it also shows you that if you leave your price at $10.00, you should expect to lose $7.40 in this round.
         Thus, conditional on your beliefs and costs of selling the widgets, you would be best to change your price in this round.
     </p>
 
@@ -207,12 +208,200 @@
 
     <br>
 
-    <b style="font-size:140%;"> Cost to Change Prices </b>
+    <b style="font-size:140%;"> Fee to Change Prices </b>
     <p>
-        In each round, if you decide to change your price you will incur a price adjustment cost of {{ group.adjust_cost }}.
-        The profit calculator detailed above will incorporate this price adjustment cost when it computes your expected profit associated with changing your price.
-        These price adjustment costs are the reason that changing your price in a round may not always be the best thing to do.
+        In each round, if you decide to change your price you will incur a price adjustment fee of {{ group.adjust_cost }}.
+        The profit calculator detailed above will incorporate this price adjustment fee when it computes your expected profit associated with changing your price.
+        These price adjustment fees are the reason that changing your price in a round may not always be the best thing to do.
     </p>
+
+    <br>
+
+    <b style="font-size:140%;"> Choosing a Price </b>
+
+    <p>
+        In each period you can use the price slider to experiment with different prices to help you decide whether it’s better to change your price or leave it at $10.00.
+    </p>
+
+    <div>
+        <em>Quiz 6:</em>
+        {{ formfield quiz6 }}
+    </div>
+
+    <div>
+
+        <p>
+            You can use the slider to adjust your price.
+        </p>
+
+        <style>
+            input[name=slider_price] {
+              -webkit-appearance: none;
+              width: 100%;
+              height: 15px;
+              border-radius: 5px;
+              background: #d3d3d3;
+              outline: none;
+              opacity: 0.7;
+              -webkit-transition: .2s;
+              transition: opacity .2s;
+            }
+
+            input[name=slider_price] {
+                -webkit-appearance: none;
+                margin: 18px 0;
+                width: 100%;
+            }
+
+            input[name=slider_price]:hover {
+                opacity: 1; /* Fully shown on mouse-over */
+            }
+
+             input[name=slider_price]::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 25px;
+              height: 25px;
+              border-radius: 50%;
+              background: #1e5bff;
+              cursor: pointer;
+            }
+        </style>
+
+        <input type="range" name="slider_price" id="setPrice" min="7" max="13" step="0.01" oninput="updateDescription(); update(); update_button();"  onkeydown="return event.key != 'Enter';">
+
+        <script>
+            let xyz = 10.00;
+            $(document).ready(function() {
+                $("#setPrice").val(xyz);
+            });
+        </script>
+
+        <script>
+            function update() {
+                let price = document.getElementById("setPrice").value;
+                document.getElementById('selected_price').innerText = `You selected $${price}.`
+            }
+        </script>
+
+        <p id="selected_price">
+              <script type="text/javascript">
+                let z2 = document.getElementById("setPrice").value;
+              </script>
+            The initial price is $<script type="text/javascript">document.write(z2)</script>.00.
+        </p>
+
+        <p>
+            <em><font size="+1">Your Beliefs About the Average Price in the Market</font></em>
+
+            <table class="table" style="table-layout: fixed">
+                <tr>
+                    <th style="width:200px">Average Price</th><th style="width:60px">$6</th><th style="width:60px">$7</th><th style="width:60px">$8</th><th style="width:60px">$9</th><th style="width:60px">$10</th><th style="width:60px">$11</th><th style="width:60px">$12</th><th style="width:60px">$13</th><th style="width:60px">$14</th><th style="width:200">Total Probability</th>
+                </tr>
+                <tr id="probability">
+                    <td>Probability</td><td>0</td><td>0</td><td>100</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100</td>
+                </tr>
+                <tr id="profitAdjust">
+                    <td>Profit from Adjusting</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr id="profitNonAdjust">
+                    <td>Profit from Not Adjusting</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            </table>
+        </p>
+
+        <style type="text/css">
+            table td#changed_profit {border:solid 4px red}
+            table td#unchanged_profit {border:solid 4px red}
+            td {white-space:nowrap}
+        </style>
+
+        <p>
+            <table id="description" class="table" style="width:750px; margin-left:auto;margin-right:auto;">
+                <tr>
+                    <th>Therefore, if you</th><th></th><th id="expected_profit">Your Expected Profit (computed based on your belief)</th>
+                </tr>
+                <tr id="final_profit">
+                    <td style="width:200px">Change price to:</td><td style="width:120px">{{ player.slider_price }}</td><td id="changed_profit">$0.00</td>
+                </tr>
+                <tr id="final_init_profit">
+                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td id="unchanged_profit">$0.00</td>
+                </tr>
+            </table>
+        </p>
+
+        <script>
+            let cost = 6.2;
+            let alpha = 9.2;
+            let beta = 2.5;
+            let theta = 1.8;
+            let adjust_cost = 2;
+            let init_price = 10;
+
+            function updateDescription() {
+                let price = document.getElementById("setPrice").value;
+
+                //Row of profit from adjusting
+                let profitAdjust6 = ((price - cost) * (alpha - beta * price + theta * 6) - adjust_cost).toFixed(2);
+                let profitAdjust7 = ((price - cost) * (alpha - beta * price + theta * 7) - adjust_cost).toFixed(2);
+                let profitAdjust8 = ((price - cost) * (alpha - beta * price + theta * 8) - adjust_cost).toFixed(2);
+                let profitAdjust9 = ((price - cost) * (alpha - beta * price + theta * 9) - adjust_cost).toFixed(2);
+                let profitAdjust10 = ((price - cost) * (alpha - beta * price + theta * 10) - adjust_cost).toFixed(2);
+                let profitAdjust11 = ((price - cost) * (alpha - beta * price + theta * 11) - adjust_cost).toFixed(2);
+                let profitAdjust12 = ((price - cost) * (alpha - beta * price + theta * 12) - adjust_cost).toFixed(2);
+                let profitAdjust13 = ((price - cost) * (alpha - beta * price + theta * 13) - adjust_cost).toFixed(2);
+                let profitAdjust14 = ((price - cost) * (alpha - beta * price + theta * 14) - adjust_cost).toFixed(2);
+                let Row2 = document.getElementById("profitAdjust");
+                let Cells2 = Row2.getElementsByTagName("td");
+                Cells2[1].innerText = `$${profitAdjust6}`
+                Cells2[2].innerText = `$${profitAdjust7}`
+                Cells2[3].innerText = `$${profitAdjust8}`
+                Cells2[4].innerText = `$${profitAdjust9}`
+                Cells2[5].innerText = `$${profitAdjust10}`
+                Cells2[6].innerText = `$${profitAdjust11}`
+                Cells2[7].innerText = `$${profitAdjust12}`
+                Cells2[8].innerText = `$${profitAdjust13}`
+                Cells2[9].innerText = `$${profitAdjust14}`
+
+                //Row of profit from non_adjusting
+                let profitNonAdjust6 = ((init_price - cost) * (alpha - beta * init_price + theta * 6)).toFixed(2);
+                let profitNonAdjust7 = ((init_price - cost) * (alpha - beta * init_price + theta * 7)).toFixed(2);
+                let profitNonAdjust8 = ((init_price - cost) * (alpha - beta * init_price + theta * 8)).toFixed(2);
+                let profitNonAdjust9 = ((init_price - cost) * (alpha - beta * init_price + theta * 9)).toFixed(2);
+                let profitNonAdjust10 = ((init_price - cost) * (alpha - beta * init_price + theta * 10)).toFixed(2);
+                let profitNonAdjust11 = ((init_price - cost) * (alpha - beta * init_price + theta * 11)).toFixed(2);
+                let profitNonAdjust12 = ((init_price - cost) * (alpha - beta * init_price + theta * 12)).toFixed(2);
+                let profitNonAdjust13 = ((init_price - cost) * (alpha - beta * init_price + theta * 13)).toFixed(2);
+                let profitNonAdjust14 = ((init_price - cost) * (alpha - beta * init_price + theta * 14)).toFixed(2);
+                let Row_non = document.getElementById("profitNonAdjust");
+                let Cells_non = Row_non.getElementsByTagName("td");
+                Cells_non[1].innerText = `$${profitNonAdjust6}`
+                Cells_non[2].innerText = `$${profitNonAdjust7}`
+                Cells_non[3].innerText = `$${profitNonAdjust8}`
+                Cells_non[4].innerText = `$${profitNonAdjust9}`
+                Cells_non[5].innerText = `$${profitNonAdjust10}`
+                Cells_non[6].innerText = `$${profitNonAdjust11}`
+                Cells_non[7].innerText = `$${profitNonAdjust12}`
+                Cells_non[8].innerText = `$${profitNonAdjust13}`
+                Cells_non[9].innerText = `$${profitNonAdjust14}`
+
+                //Row of final profit from adjusting
+                let Row = document.getElementById("final_profit");
+                let Cells = Row.getElementsByTagName("td");
+                let expected_profit = profitAdjust8;
+                Cells[1].innerText = `$${price}`
+                Cells[2].innerText = `$${expected_profit}`
+
+                //Row of final profit from non_adjusting
+                let Row_init_non = document.getElementById("final_init_profit");
+                let Cells_init_non = Row_init_non.getElementsByTagName("td");
+                let expected_init_profit = profitNonAdjust8;
+                Cells_init_non[1].innerText = `$10.00`
+                Cells_init_non[2].innerText = `$${expected_init_profit}`
+            }
+        </script>
+
+    </div>
 
     <br>
 
@@ -233,6 +422,7 @@
     </p>
 
     <br>
+
 
     {{ next_button }}
 

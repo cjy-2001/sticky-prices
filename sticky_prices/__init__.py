@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 10
+    NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -20,11 +20,14 @@ class C(BaseConstants):
 
     INIT_PRICE = [cu(10)] * NUM_ROUNDS
     INIT_COST = cu(9.2)
-    NEW_PRODUCT_COST = [cu(8.7), cu(8.7), cu(10.7), cu(9.7), cu(6.2), cu(8.2), cu(11.2), cu(12.2), cu(7.7), cu(10.2), cu(7.2)]
+    NEW_PRODUCT_COST = [cu(10.45), cu(7.45), cu(9.70), cu(10.45), cu(7.95),
+                        cu(11.70), cu(8.70), cu(6.70), cu(10.95), cu(7.45),
+                        cu(9.70), cu(10.45), cu(7.95), cu(11.70), cu(8.70),
+                        cu(6.70), cu(10.95)]
     ALPHA = [9.2] * NUM_ROUNDS
-    THETA = [1.8] * NUM_ROUNDS
     BETA = [2.5] * NUM_ROUNDS
-    ADJUST_COST = [cu(3)] * NUM_ROUNDS
+    THETA = [1.8] * NUM_ROUNDS
+    ADJUST_COST = [cu(2)] * NUM_ROUNDS
     START_EARNINGS = cu(15)
 
 
@@ -64,8 +67,8 @@ class Player(BasePlayer):
     timeout = models.BooleanField(initial=False)
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
-                               choices=["A. I must charge $10", "B. I am not allowed to charge $10", "C. I can keep my price at $10 or I can change it"],
-                               label="If yesterday’s price is $10, which of the following is true:")
+                               choices=["A. I must charge $10.00", "B. I am not allowed to charge $10.00", "C. I can keep my price at $10.00 or I can change it"],
+                               label="If yesterday’s price is $10.00, which of the following is true:")
     quiz2 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The buyers will want to buy more from me", "B. The buyers will want to buy less from me"],
                                label="If you increase your price, then:")
@@ -78,6 +81,10 @@ class Player(BasePlayer):
     quiz5 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The market price", "B. The price I set", "C. The cost of producing a widget", "D. All of the above"],
                                label="Which of the following can affect your profit?")
+    quiz6 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. $7.82", "B. $8.93", "C. $10.00", "D. $11.21"],
+                               label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2. "
+                                     "Moving the slider. Which price would maximize the profit you receive from adjusting your price?")
 
 
 # FUNCTIONS
@@ -171,7 +178,7 @@ def custom_export(players):
 # PAGES
 class Introduction(Page):
     form_model = 'player'
-    form_fields = ['quiz1', 'quiz2', 'quiz3', 'quiz4', 'quiz5']
+    form_fields = ['quiz1', 'quiz2', 'quiz3', 'quiz4', 'quiz5', 'quiz6']
 
     @staticmethod
     def is_displayed(player: Player):
@@ -180,9 +187,10 @@ class Introduction(Page):
 
     @staticmethod
     def error_message(player, values):
-        if values['quiz1'] != "C. I can keep my price at $10 or I can change it" or values['quiz2'] != "B. The buyers will want to buy less from me"\
+        if values['quiz1'] != "C. I can keep my price at $10.00 or I can change it" or values['quiz2'] != "B. The buyers will want to buy less from me"\
                 or values['quiz3'] != "A. The buyers will want to buy more from me, since the other sellers seem like a worse deal"\
-                or values['quiz4'] != "B. Enter two numbers of 50 in the 7's and 8's columns" or values['quiz5'] != "D. All of the above":
+                or values['quiz4'] != "B. Enter two numbers of 50 in the 7's and 8's columns" or values['quiz5'] != "D. All of the above"\
+                or values['quiz6'] != "A. $7.82":
             return 'One or more answers to the quiz are incorrect, please try again.'
 
 
@@ -215,7 +223,8 @@ class Introduction(Page):
                     quiz2='quiz2',
                     quiz3='quiz3',
                     quiz4='quiz4',
-                    quiz5='quiz5'
+                    quiz5='quiz5',
+                    quiz6='quiz6'
                     )
 
 
@@ -321,7 +330,7 @@ class ResultsWaitPage2(WaitPage):
 
 
 class Results(Page):
-    timeout_seconds = 20    
+    timeout_seconds = 60
     timer_text = "Time left to advance to the next page:"
 
     @staticmethod
