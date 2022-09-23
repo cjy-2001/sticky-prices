@@ -10,7 +10,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
     NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
@@ -328,6 +328,8 @@ class ResultsWaitPage1(WaitPage):
 class ResultsWaitPage2(WaitPage):
     after_all_players_arrive = set_payoffs
 
+class ResultsWaitPage3(WaitPage):
+    pass
 
 class Results(Page):
     timeout_seconds = 60
@@ -391,4 +393,4 @@ class ThankYou(Page):
                     )
 
 
-page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, PracticeFeedback, ResultsWaitPage1, ThankYou]
+page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, ThankYou]
