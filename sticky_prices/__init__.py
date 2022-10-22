@@ -10,7 +10,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 1
     NUM_PRACTICE_ROUNDS = 1
     NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
@@ -83,8 +83,8 @@ class Player(BasePlayer):
                                label="Which of the following can affect your profit?")
     quiz6 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. $7.82", "B. $8.93", "C. $10.00", "D. $11.21"],
-                               label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2. "
-                                     "Moving the slider. Which price would maximize the profit you receive from adjusting your price?")
+                               label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2 (as shown in the table above). "
+                                     "Moving the slider, which price would maximize the profit you receive from adjusting your price?")
 
 
 # FUNCTIONS
@@ -365,6 +365,9 @@ class Results(Page):
 
 
 class PracticeFeedback(Page):
+    timeout_seconds = 30
+    timer_text = "Time left to advance to the next page:"
+
     @staticmethod
     def is_displayed(player: Player):
         subsession = player.subsession

@@ -21,7 +21,7 @@
 
     <p>
         You will choose prices in a series of {{ C.NUM_PRACTICE_ROUNDS }} practice round and {{ C.NUM_REAL_ROUNDS }} real rounds.
-        Each of these rounds are “one-shot” games, meaning that decisions you make in a previous round do no impact decisions or profits you can make in later rounds.
+        Each of these rounds are “one-shot” games, meaning that decisions you make in a previous round do not impact decisions or profits you can make in later rounds.
     </p>
 
     <br>
@@ -56,12 +56,12 @@
 
     <p>
         The profits you earn in each round are determined by your price, your production cost, the average price set in the market,
-        and if you incur a cost associated with changing your price from {{ group.init_price }}.
+        and if you incur a fee associated with changing your price from {{ group.init_price }}.
         The profits you earn in each round will be determined by:
     </p>
 
     <p>
-        <em>Profit = (Your price – new production cost)*Demand – (cost to change prices)</em>
+        <em>Profit = (Your price – new production cost)*Demand – (fee to change prices)</em>
     </p>
 
     <p>
@@ -223,16 +223,31 @@
         In each period you can use the price slider to experiment with different prices to help you decide whether it’s better to change your price or leave it at $10.00.
     </p>
 
-    <div>
-        <em>Quiz 6:</em>
-        {{ formfield quiz6 }}
-    </div>
+    <p>
+        The table presented below is to help you consider the outcomes that depend both on your choices and on the market price.
+        We have set the beliefs for you with 100 on a market price of $8, but during the experiment you will be able to set those beliefs yourself.
+        When you move the slider, numbers will appear in the table.
+    </p>
+
+    <p>
+        First, observe the $-19.00 in the lower left of the table.
+        That means that if the market price is $6 on average and you do not adjust your price, then you would lose $19 in the round.
+        The large $35.72 in the lower right is not a profit you can achieve unless the average price of all other players is $14.
+        If the average market price is high, recall, then more buyers will buy from you.
+    </p>
+
+    <p>
+        The row of the table labeled "Profit from Adjusting" shows how much profit you can expect depending on the market price.
+        The Profit from Adjusting will change as you drag your slider.
+        It's the profit you expect if the other people pick the price in the top row of the table and you pick the price your slider is currently on.
+    </p>
+
+    <p>
+        The numbers from the table in the “Profit from Adjusting” and “Profit from Not Adjusting” rows are only relevant if you think those prices might occur in the market.
+        For example, if you assign a belief of 0 for a price of $6, the profit numbers for adjusting/not adjusting in that column are irrelevant to you since you think there is no chance that will happen.
+    </p>
 
     <div>
-
-        <p>
-            You can use the slider to adjust your price.
-        </p>
 
         <style>
             input[name=slider_price] {
@@ -401,6 +416,11 @@
             }
         </script>
 
+    </div>
+
+    <div>
+        <em>Quiz 6:</em>
+        {{ formfield quiz6 }}
     </div>
 
     <br>
