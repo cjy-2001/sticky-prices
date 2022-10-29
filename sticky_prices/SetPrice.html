@@ -33,7 +33,7 @@
 
         <p>
             {{ if first_round }}
-                <b>In this round, everyone's production cost (including yours) has gone DOWN from $9.20 by $1.25, and is now $10.45.</b>
+                <b>In this round, everyone's production cost (including yours) has gone UP from $9.20 by $1.25, and is now $10.45.</b>
             {{ else }}
                 {{ if up }}
                     <b>In this round, everyone's production cost (including yours) has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
@@ -44,7 +44,7 @@
         </p>
 
         <p>
-            You can decide if you want to adjust the inital price of {{ group.init_price }}.
+            You can decide if you want to adjust the initial price of {{ group.init_price }}.
         </p>
     </div>
 
