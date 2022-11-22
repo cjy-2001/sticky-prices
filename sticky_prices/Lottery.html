@@ -1,0 +1,78 @@
+{{ block title }}Loss Aversion Question{{ endblock }}
+{{ block content }}
+
+    <p>
+        This is the last page of the experiment.
+        You will make one final decision.
+        Based on the outcome, additional money may be added to your final payment.
+        There are 6 options presented on this screen.
+        Each option has a 50% chance of adding money to your final payment and an equal chance of losing money.
+    </p>
+
+    <p>
+        If you would like to participate in this final opportunity to change your payment, you can select “Yes” for as many options as you would like to try.
+        The computer will make a random selection for one of the 6 rows.
+        Then, if you said “Yes” to that row, the computer will flip a coin (virtually) to randomly decide whether you gain $7 or lose money according to the amount listed for that option.
+        Select “Yes” for as many options as you would like to have the opportunity of playing.
+        On the following screen, you will learn the outcome of your decision.
+    </p>
+
+    <table class="table">
+        <tr>
+            <th></th><th>50% Chance Outcome</th><th>50% Chance Outcome</th>
+        </tr>
+        <tr>
+            <td>Lottery 1</td><td>$7</td><td>-$3</td>
+        </tr>
+        <tr>
+            <td>Lottery 2</td><td>$7</td><td>-$4</td>
+        </tr>
+        <tr>
+            <td>Lottery 3</td><td>$7</td><td>-$5</td>
+        </tr>
+        <tr>
+            <td>Lottery 4</td><td>$7</td><td>-$6</td>
+        </tr>
+        <tr>
+            <td>Lottery 5</td><td>$7</td><td>-$7</td>
+        </tr>
+        <tr>
+            <td>Lottery 6</td><td>$7</td><td>-$8</td>
+        </tr>
+    </table>
+
+    <br>
+
+    <div>
+        <em>Lottery 1:</em>
+        {{ formfield 'lottery3' }}
+    </div>
+
+    <div>
+        <em>Lottery 2:</em>
+        {{ formfield 'lottery4' }}
+    </div>
+
+    <div>
+        <em>Lottery 3:</em>
+        {{ formfield 'lottery5' }}
+    </div>
+
+    <div>
+        <em>Lottery 4:</em>
+        {{ formfield 'lottery6' }}
+    </div>
+
+    <div>
+        <em>Lottery 5:</em>
+        {{ formfield 'lottery7' }}
+    </div>
+
+    <div>
+        <em>Lottery 6:</em>
+        {{ formfield 'lottery8' }}
+    </div>
+
+    {{ next_button }}
+
+{{ endblock }}

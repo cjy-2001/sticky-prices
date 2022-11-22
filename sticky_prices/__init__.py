@@ -1,5 +1,5 @@
 from otree.api import *
-
+import random
 
 doc = """
 Sticky prices experiment based on oTree.
@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 16
+    NUM_REAL_ROUNDS = 1
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -62,8 +62,7 @@ class Player(BasePlayer):
     profit = models.CurrencyField(initial=0)
     sec_profit = models.CurrencyField(initial=0)
     is_adjusted = models.BooleanField(initial=False)
-    earnings = models.CurrencyField()
-
+    earnings = models.CurrencyField(initial=0)
     timeout = models.BooleanField(initial=False)
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
@@ -85,6 +84,29 @@ class Player(BasePlayer):
                                choices=["A. $7.82", "B. $8.93", "C. $10.00", "D. $11.21"],
                                label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2 (as shown in the table above). "
                                      "Moving the slider, which price would maximize the profit you receive from adjusting your price?")
+
+    lottery3 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $3)?")
+    lottery4 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $4)?")
+    lottery5 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $5)?")
+    lottery6 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $6)?")
+    lottery7 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $7)?")
+    lottery8 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter enter the first lottery (50% chance to lose $8)?")
+
+    whichLottery = models.StringField(initial="")
+    decision = models.BooleanField(initial=False)
+    win = models.BooleanField(initial=False)
 
 
 # FUNCTIONS
@@ -163,11 +185,30 @@ def earnings_history(player: Player):
     return sum(p.profit for p in player.in_all_rounds()) + C.START_EARNINGS
 
 
+def finalLottery(player: Player):
+    player.whichLottery = random.choice(["Lottery 1", "Lottery 2", "Lottery 3", "Lottery 4", "Lottery 5", "Lottery 6"])
+    winOrLose = random.randint(1, 2)
+    if winOrLose == 2:
+        player.win = True
+
+    attribute = player.whichLottery.replace(" ", "").lower()
+    attribute = attribute[:-1] + str(int(attribute[-1]) + 2)
+    player.decision = getattr(player, attribute)
+
+    if player.decision:
+        if player.win:
+            player.earnings += 7
+        else:
+            player.earnings -= int(attribute[-1])
+
+
+
 def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)']
+           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)',
+           'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
@@ -374,6 +415,71 @@ class PracticeFeedback(Page):
         return subsession.is_practice_round
 
 
+class Lottery(Page):
+    form_model = 'player'
+    form_fields = ['lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8']
+
+    @staticmethod
+    def before_next_page(player, timeout_happened):
+        finalLottery(player)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        practice_earnings = earnings_history(player)
+        return dict(player_expected_avg = player.expected_avg,
+                    player_slider_price=player.slider_price,
+                    player_price=player.price,
+                    player_profit=player.profit,
+                    player_earnings=player.earnings,
+                    play_adjusted=player.is_adjusted,
+                    timeout=player.timeout,
+
+                    group_avg=player.group.avg,
+                    group_cost=player.group.cost,
+                    group_init_price=player.group.init_price,
+                    practice_earnings=practice_earnings,
+                    payoff=player.payoff,
+
+                    # lottery3=player.lottery3,
+                    # lottery4=player.lottery4,
+                    # lottery5=player.lottery5,
+                    # lottery6=player.lottery6,
+                    # lottery7=player.lottery7,
+                    # lottery8=player.lottery8,
+                    whichLottery=player.whichLottery,
+                    decision=player.decision,
+                    win=player.win
+                    )
+
+class LotteryResult(Page):
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict(player_expected_avg = player.expected_avg,
+                    player_slider_price=player.slider_price,
+                    player_price = player.price,
+                    player_profit = player.profit,
+                    player_adjusted = player.is_adjusted,
+                    player_earnings= player.earnings,
+
+                    group_avg = player.group.avg,
+                    group_cost = player.group.cost,
+                    group_init_price = player.group.init_price,
+                    payoff=player.payoff,
+
+                    lottery3=player.lottery3,
+                    lottery4=player.lottery4,
+                    lottery5=player.lottery5,
+                    lottery6=player.lottery6,
+                    lottery7=player.lottery7,
+                    lottery8=player.lottery8,
+                    whichLottery=player.whichLottery,
+                    decision=player.decision,
+                    win=player.win
+                    )
+
+
 class ThankYou(Page):
     @staticmethod
     def is_displayed(player: Player):
@@ -392,8 +498,18 @@ class ThankYou(Page):
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,
                     group_init_price = player.group.init_price,
-                    payoff=player.payoff
+                    payoff=player.payoff,
+
+                    lottery3=player.lottery3,
+                    lottery4=player.lottery4,
+                    lottery5=player.lottery5,
+                    lottery6=player.lottery6,
+                    lottery7=player.lottery7,
+                    lottery8=player.lottery8,
+                    whichLottery=player.whichLottery,
+                    decision=player.decision,
+                    win=player.win
                     )
 
 
-page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, ThankYou]
+page_sequence = [Lottery, LotteryResult, Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, Lottery, LotteryResult, ThankYou]

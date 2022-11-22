@@ -1,0 +1,40 @@
+{{ block title }}Lottery Result{{ endblock }}
+{{ block content }}
+
+    {{ if player.decision }}
+
+        <p>
+            The computer randomly selected the {{ player.whichLottery }}.
+            Based on your input, you decide to enter that lottery.
+        </p>
+
+        {{ if player.win }}
+
+            <p>
+                As a result, you win the lottery! Your total earning has come to {{ player.earnings }}.
+            </p>
+
+        {{ else }}
+
+            <p>
+                Unfortunately, you lose the lottery. Your total earnings has come to {{ player.earnings }}.
+            </p>
+
+        {{ endif }}
+
+    {{ else }}
+
+        <p>
+            The computer randomly selected the {{ player.whichLottery }}.
+            Based on your input, you decide not to enter that lottery.
+        </p>
+
+        <p>
+            Therefore, your earning stays as {{ player.earnings }}.
+        </p>
+
+    {{ endif }}
+
+    {{ next_button }}
+
+{{ endblock }}
