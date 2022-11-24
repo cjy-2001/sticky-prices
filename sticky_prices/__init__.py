@@ -12,7 +12,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 class C(BaseConstants):
     PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 1
+    NUM_REAL_ROUNDS = 3
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -103,6 +103,9 @@ class Player(BasePlayer):
     lottery8 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
                                    label="Would you like to enter enter the first lottery (50% chance to lose $8)?")
+    gender = models.StringField(widget=widgets.RadioSelect,
+                                   choices=["Male", "Female", "Non-binary", "Other", "Prefer not to answer"],
+                                   label="What is your gender identity?")
 
     whichLottery = models.StringField(initial="")
     decision = models.BooleanField(initial=False)
@@ -207,7 +210,7 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)',
+           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)', 'gender',
            'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8']
     for p in players:
         participant = p.participant
@@ -417,7 +420,11 @@ class PracticeFeedback(Page):
 
 class Lottery(Page):
     form_model = 'player'
-    form_fields = ['lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8']
+    form_fields = ['lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'gender']
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
 
     @staticmethod
     def before_next_page(player, timeout_happened):
@@ -453,6 +460,10 @@ class Lottery(Page):
                     )
 
 class LotteryResult(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
+
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
@@ -508,8 +519,9 @@ class ThankYou(Page):
                     lottery8=player.lottery8,
                     whichLottery=player.whichLottery,
                     decision=player.decision,
-                    win=player.win
+                    win=player.win,
+                    gender=player.gender
                     )
 
 
-page_sequence = [Lottery, LotteryResult, Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, Lottery, LotteryResult, ThankYou]
+page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, Lottery, LotteryResult, ThankYou]
