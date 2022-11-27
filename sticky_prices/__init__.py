@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 3
+    NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
