@@ -87,22 +87,22 @@ class Player(BasePlayer):
 
     lottery3 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $3)?")
+                                   label="Would you like to enter the first lottery (50% chance to lose $3)?")
     lottery4 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $4)?")
+                                   label="Would you like to enter the second lottery (50% chance to lose $4)?")
     lottery5 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $5)?")
+                                   label="Would you like to enter the third lottery (50% chance to lose $5)?")
     lottery6 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $6)?")
+                                   label="Would you like to enter the fourth lottery (50% chance to lose $6)?")
     lottery7 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $7)?")
+                                   label="Would you like to enter the fifth lottery (50% chance to lose $7)?")
     lottery8 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter enter the first lottery (50% chance to lose $8)?")
+                                   label="Would you like to enter the sixth lottery (50% chance to lose $8)?")
     gender = models.StringField(widget=widgets.RadioSelect,
                                    choices=["Male", "Female", "Non-binary", "Other", "Prefer not to answer"],
                                    label="What is your gender identity?")
