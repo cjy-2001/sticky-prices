@@ -111,6 +111,7 @@ class Player(BasePlayer):
     decision = models.BooleanField(initial=False)
     win = models.BooleanField(initial=False)
 
+    comment = models.StringField()
 
 # FUNCTIONS
 def set_payoffs(group: Group):
@@ -211,7 +212,7 @@ def custom_export(players):
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
            'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)', 'gender',
-           'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8']
+           'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'comment']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
@@ -491,7 +492,44 @@ class LotteryResult(Page):
                     )
 
 
+class Feedback(Page):
+
+    form_model = 'player'
+    form_fields = ['comment']
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        group = player.group
+        return dict(player_expected_avg = player.expected_avg,
+                    player_slider_price=player.slider_price,
+                    player_price = player.price,
+                    player_profit = player.profit,
+                    player_adjusted = player.is_adjusted,
+                    player_earnings= player.earnings,
+
+                    group_avg = player.group.avg,
+                    group_cost = player.group.cost,
+                    group_init_price = player.group.init_price,
+                    payoff=player.payoff,
+
+                    lottery3=player.lottery3,
+                    lottery4=player.lottery4,
+                    lottery5=player.lottery5,
+                    lottery6=player.lottery6,
+                    lottery7=player.lottery7,
+                    lottery8=player.lottery8,
+                    whichLottery=player.whichLottery,
+                    decision=player.decision,
+                    win=player.win
+                    )
+
+
 class ThankYou(Page):
+
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == C.NUM_ROUNDS
@@ -520,8 +558,9 @@ class ThankYou(Page):
                     whichLottery=player.whichLottery,
                     decision=player.decision,
                     win=player.win,
-                    gender=player.gender
+                    gender=player.gender,
+                    comment=player.comment
                     )
 
 
-page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, Lottery, LotteryResult, ThankYou]
+page_sequence = [Introduction, ResultsWaitPage1, SetPrice, ResultsWaitPage2, Results, ResultsWaitPage3, PracticeFeedback, ResultsWaitPage1, Lottery, LotteryResult, Feedback, ThankYou]
