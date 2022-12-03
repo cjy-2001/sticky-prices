@@ -211,13 +211,14 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)', 'gender',
-           'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'comment']
+           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)',
+           'gender', 'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'comment']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
                p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
-               p.expected_avg, p.slider_price, p.price, p.timeout, p.payoff, p.earnings]
+               p.expected_avg, p.slider_price, p.price, p.timeout, p.payoff, p.earnings,
+               p.gender, p.lottery3, p.lottery4, p.lottery5, p.lottery6, p.lottery7, p.lottery8, p.comment]
 
 
 # PAGES
