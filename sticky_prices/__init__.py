@@ -85,24 +85,22 @@ class Player(BasePlayer):
                                label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2 (as shown in the table above). "
                                      "Moving the slider, which price would maximize the profit you receive from adjusting your price?")
 
+    lottery1 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter the first lottery (50% chance to lose $1)?")
+    lottery2 = models.BooleanField(widget=widgets.RadioSelect,
+                                   choices=[[True,"A. Yes"], [False, "B. No"]],
+                                   label="Would you like to enter the second lottery (50% chance to lose $2)?")
     lottery3 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the first lottery (50% chance to lose $3)?")
+                                   label="Would you like to enter the third lottery (50% chance to lose $3)?")
     lottery4 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the second lottery (50% chance to lose $4)?")
+                                   label="Would you like to enter the fourth lottery (50% chance to lose $4)?")
     lottery5 = models.BooleanField(widget=widgets.RadioSelect,
                                    choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the third lottery (50% chance to lose $5)?")
-    lottery6 = models.BooleanField(widget=widgets.RadioSelect,
-                                   choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the fourth lottery (50% chance to lose $6)?")
-    lottery7 = models.BooleanField(widget=widgets.RadioSelect,
-                                   choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the fifth lottery (50% chance to lose $7)?")
-    lottery8 = models.BooleanField(widget=widgets.RadioSelect,
-                                   choices=[[True,"A. Yes"], [False, "B. No"]],
-                                   label="Would you like to enter the sixth lottery (50% chance to lose $8)?")
+                                   label="Would you like to enter the fifth lottery (50% chance to lose $5)?")
+
     gender = models.StringField(widget=widgets.RadioSelect,
                                    choices=["Male", "Female", "Non-binary", "Other", "Prefer not to answer"],
                                    label="What is your gender identity?")
@@ -191,20 +189,19 @@ def earnings_history(player: Player):
 
 
 def finalLottery(player: Player):
-    player.whichLottery = random.choice(["Lottery 1", "Lottery 2", "Lottery 3", "Lottery 4", "Lottery 5", "Lottery 6"])
+    player.whichLottery = random.choice(["lottery1", "lottery2", "lottery3", "lottery4", "lottery5"])
     winOrLose = random.randint(1, 2)
     if winOrLose == 2:
         player.win = True
 
-    attribute = player.whichLottery.replace(" ", "").lower()
-    attribute = attribute[:-1] + str(int(attribute[-1]) + 2)
+    attribute = player.whichLottery
     player.decision = getattr(player, attribute)
 
     if player.decision:
         if player.win:
-            player.earnings += 7
-            player.payoff += 7
-            player.lotteryResult += 7
+            player.earnings += 4
+            player.payoff += 4
+            player.lotteryResult += 4
         else:
             player.earnings -= int(attribute[-1])
             player.payoff -= int(attribute[-1])
@@ -216,13 +213,13 @@ def custom_export(players):
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
            'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)', 'lotteryResult',
-           'gender', 'lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'comment']
+           'gender', 'lottery1', 'lottery2', 'lottery3', 'lottery4', 'lottery5', 'comment']
     for p in players:
         participant = p.participant
         yield [participant.code, p.round_number,
                p.prob6, p.prob7, p.prob8, p.prob9, p.prob10, p.prob11, p.prob12, p.prob13, p.prob14,
                p.expected_avg, p.slider_price, p.price, p.timeout, p.payoff, p.earnings, p.lotteryResult,
-               p.gender, p.lottery3, p.lottery4, p.lottery5, p.lottery6, p.lottery7, p.lottery8, p.comment]
+               p.gender, p.lottery1, p.lottery2, p.lottery3, p.lottery4, p.lottery5, p.comment]
 
 
 # PAGES
@@ -426,7 +423,7 @@ class PracticeFeedback(Page):
 
 class Lottery(Page):
     form_model = 'player'
-    form_fields = ['lottery3', 'lottery4', 'lottery5', 'lottery6', 'lottery7', 'lottery8', 'gender']
+    form_fields = ['lottery1', 'lottery2', 'lottery3', 'lottery4', 'lottery5', 'gender']
 
     @staticmethod
     def is_displayed(player: Player):
@@ -453,13 +450,6 @@ class Lottery(Page):
                     group_init_price=player.group.init_price,
                     practice_earnings=practice_earnings,
                     payoff=player.payoff,
-
-                    # lottery3=player.lottery3,
-                    # lottery4=player.lottery4,
-                    # lottery5=player.lottery5,
-                    # lottery6=player.lottery6,
-                    # lottery7=player.lottery7,
-                    # lottery8=player.lottery8,
                     whichLottery=player.whichLottery,
                     decision=player.decision,
                     win=player.win
@@ -485,12 +475,11 @@ class LotteryResult(Page):
                     group_init_price = player.group.init_price,
                     payoff=player.payoff,
 
+                    lottery1=player.lottery1,
+                    lottery2=player.lottery2,
                     lottery3=player.lottery3,
                     lottery4=player.lottery4,
                     lottery5=player.lottery5,
-                    lottery6=player.lottery6,
-                    lottery7=player.lottery7,
-                    lottery8=player.lottery8,
                     whichLottery=player.whichLottery,
                     decision=player.decision,
                     win=player.win
@@ -521,12 +510,11 @@ class Feedback(Page):
                     group_init_price = player.group.init_price,
                     payoff=player.payoff,
 
+                    lottery1=player.lottery1,
+                    lottery2=player.lottery2,
                     lottery3=player.lottery3,
                     lottery4=player.lottery4,
                     lottery5=player.lottery5,
-                    lottery6=player.lottery6,
-                    lottery7=player.lottery7,
-                    lottery8=player.lottery8,
                     whichLottery=player.whichLottery,
                     decision=player.decision,
                     win=player.win
@@ -554,12 +542,11 @@ class ThankYou(Page):
                     group_init_price = player.group.init_price,
                     payoff=player.payoff,
 
+                    lottery1=player.lottery1,
+                    lottery2=player.lottery2,
                     lottery3=player.lottery3,
                     lottery4=player.lottery4,
                     lottery5=player.lottery5,
-                    lottery6=player.lottery6,
-                    lottery7=player.lottery7,
-                    lottery8=player.lottery8,
                     whichLottery=player.whichLottery,
                     decision=player.decision,
                     win=player.win,
