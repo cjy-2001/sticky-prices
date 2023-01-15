@@ -12,7 +12,7 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 class C(BaseConstants):
     PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 16
+    NUM_REAL_ROUNDS = 1
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -66,21 +66,25 @@ class Player(BasePlayer):
     timeout = models.BooleanField(initial=False)
 
     quiz1 = models.StringField(widget=widgets.RadioSelect,
+                               choices=["A. I will stay with the same group of 5 people throughout the entire experiment", "B. Other people will get re-sorted so that I am not with the same 5 people I had played with previously"],
+                               label="When you move to a new round, you will have another decision to make about adjusting your price or keeping it at $10. "
+                                     "Do you stay with the same 5 people from round to round, or does group membership get reshuffled each time?”")
+    quiz2 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10.00", "B. I am not allowed to charge $10.00", "C. I can keep my price at $10.00 or I can change it"],
                                label="If yesterday’s price is $10.00, which of the following is true:")
-    quiz2 = models.StringField(widget=widgets.RadioSelect,
+    quiz3 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The buyers will want to buy more from me", "B. The buyers will want to buy less from me"],
                                label="If you increase your price, then:")
-    quiz3 = models.StringField(widget=widgets.RadioSelect,
+    quiz4 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The buyers will want to buy more from me, since the other sellers seem like a worse deal", "B. The buyers will want to buy less from me"],
                                label="If the average price in the market increases, due to the decisions of the other sellers, then:")
-    quiz4 = models.StringField(widget=widgets.RadioSelect,
+    quiz5 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. Enter two numbers of 100 in the 7's and 8's columns", "B. Enter two numbers of 50 in the 7's and 8's columns", "C. Enter two numbers of 1 in the 7's and 8's columns"],
                                label="If you believe that there is a 50% chance that the market price will be 7 and a 50% chance that the market price will be 8, how would you indicate that in the probability table above?")
-    quiz5 = models.StringField(widget=widgets.RadioSelect,
+    quiz6 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. The market price", "B. The price I set", "C. The cost of producing a widget", "D. All of the above"],
                                label="Which of the following can affect your profit?")
-    quiz6 = models.StringField(widget=widgets.RadioSelect,
+    quiz7 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. $7.82", "B. $8.93", "C. $10.00", "D. $11.21"],
                                label="To practice this, suppose the production cost is $6.20 and you set your beliefs to those in Belief Example 2 (as shown in the table above). "
                                      "Moving the slider, which price would maximize the profit you receive from adjusting your price?")
@@ -149,7 +153,7 @@ def creating_session(subsession):
             subsession.round_number - C.NUM_PRACTICE_ROUNDS
         )
 
-    subsession.group_randomly()
+    #subsession.group_randomly()
     for group in subsession.get_groups():
         group.cost = C.NEW_PRODUCT_COST[subsession.round_number - 1]
         group.alpha = C.ALPHA[subsession.round_number - 1]
@@ -189,12 +193,12 @@ def earnings_history(player: Player):
 
 
 def finalLottery(player: Player):
-    player.whichLottery = random.choice(["lottery1", "lottery2", "lottery3", "lottery4", "lottery5"])
+    player.whichLottery = random.choice(["lottery 1", "lottery 2", "lottery 3", "lottery 4", "lottery 5"])
     winOrLose = random.randint(1, 2)
     if winOrLose == 2:
         player.win = True
 
-    attribute = player.whichLottery
+    attribute = player.whichLottery.replace(" ", "")
     player.decision = getattr(player, attribute)
 
     if player.decision:
@@ -225,7 +229,7 @@ def custom_export(players):
 # PAGES
 class Introduction(Page):
     form_model = 'player'
-    form_fields = ['quiz1', 'quiz2', 'quiz3', 'quiz4', 'quiz5', 'quiz6']
+    form_fields = ['quiz1', 'quiz2', 'quiz3', 'quiz4', 'quiz5', 'quiz6', 'quiz7']
 
     @staticmethod
     def is_displayed(player: Player):
@@ -234,11 +238,15 @@ class Introduction(Page):
 
     @staticmethod
     def error_message(player, values):
-        if values['quiz1'] != "C. I can keep my price at $10.00 or I can change it" or values['quiz2'] != "B. The buyers will want to buy less from me"\
-                or values['quiz3'] != "A. The buyers will want to buy more from me, since the other sellers seem like a worse deal"\
-                or values['quiz4'] != "B. Enter two numbers of 50 in the 7's and 8's columns" or values['quiz5'] != "D. All of the above"\
-                or values['quiz6'] != "A. $7.82":
+        if values['quiz1'] != "A. I will stay with the same group of 5 people throughout the entire experiment" \
+                or values['quiz2'] != "C. I can keep my price at $10.00 or I can change it"\
+                or values['quiz3'] != "B. The buyers will want to buy less from me"\
+                or values['quiz4'] != "A. The buyers will want to buy more from me, since the other sellers seem like a worse deal" \
+                or values['quiz5'] != "B. Enter two numbers of 50 in the 7's and 8's columns"\
+                or values['quiz6'] != "D. All of the above" \
+                or values['quiz7'] != "A. $7.82":
             return 'One or more answers to the quiz are incorrect, please try again.'
+
 
 
     def vars_for_template(player: Player):
@@ -271,7 +279,8 @@ class Introduction(Page):
                     quiz3='quiz3',
                     quiz4='quiz4',
                     quiz5='quiz5',
-                    quiz6='quiz6'
+                    quiz6='quiz6',
+                    quiz7='quiz7'
                     )
 
 
@@ -386,6 +395,12 @@ class Results(Page):
     def vars_for_template(player: Player):
         group = player.group
         practice_earnings = earnings_history(player)
+        num_adjusted = 0
+
+        for player in group.get_players():
+            if player.is_adjusted:
+                num_adjusted += 1
+
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price=player.price,
@@ -407,7 +422,9 @@ class Results(Page):
                     group_cost=player.group.cost,
                     group_init_price=player.group.init_price,
                     practice_earnings=practice_earnings,
-                    payoff=player.payoff
+                    payoff=player.payoff,
+
+                    num_adjusted=num_adjusted
                     )
 
 
@@ -530,6 +547,7 @@ class ThankYou(Page):
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
+        total_earnings = player.earnings + 5
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price = player.price,
@@ -551,7 +569,9 @@ class ThankYou(Page):
                     decision=player.decision,
                     win=player.win,
                     gender=player.gender,
-                    comment=player.comment
+                    comment=player.comment,
+
+                    total_earnings=total_earnings
                     )
 
 
