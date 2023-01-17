@@ -32,11 +32,11 @@ USE_POINTS = False
 
 ROOMS = [
     dict(
-        name='econ101',
+        name='sticky_prices',
         display_name='Econ Experiment',
         participant_label_file='_rooms/econ101.txt',
     ),
-    dict(name='live_demo', display_name='Real Experiment (no participant labels)'),
+    #dict(name='live_demo', display_name='Real Experiment (no participant labels)'),
 ]
 
 ADMIN_USERNAME = 'admin'
