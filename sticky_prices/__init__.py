@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 1
+    NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices/instructions.html'
@@ -27,8 +27,8 @@ class C(BaseConstants):
     ALPHA = [9.2] * NUM_ROUNDS
     BETA = [2.5] * NUM_ROUNDS
     THETA = [1.8] * NUM_ROUNDS
-    ADJUST_COST = [cu(0)] * NUM_ROUNDS
-    START_EARNINGS = cu(5)
+    ADJUST_COST = [cu(2)] * NUM_ROUNDS
+    START_EARNINGS = cu(15)
 
 
 class Subsession(BaseSubsession):
@@ -141,8 +141,8 @@ def set_payoffs(group: Group):
             p.payoff = p.profit
             p.earnings = earnings_history(p) - practice_player.profit
         else:
-            p.payoff = cu(5)
-            p.earnings = cu(5)
+            p.payoff = cu(15)
+            p.earnings = cu(15)
 
 
 def creating_session(subsession):
@@ -216,7 +216,7 @@ def custom_export(players):
     # header row
     yield ['participant_code', 'round_number',
            '6_probability', '7_probability', '8_probability', '9_probability', '10_probability', '11_probability', '12_probability', '13_probability', '14_probability',
-           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $5)', 'lotteryResult',
+           'expected_avg', 'price on slider', 'selected_price', 'timeout?', 'profit per round', 'accumulated earnings (including $15)', 'lotteryResult',
            'gender', 'lottery1', 'lottery2', 'lottery3', 'lottery4', 'lottery5', 'comment']
     for p in players:
         participant = p.participant
@@ -547,7 +547,7 @@ class ThankYou(Page):
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
-        total_earnings = player.earnings + 7.5
+        total_earnings = player.earnings + 5
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price = player.price,
