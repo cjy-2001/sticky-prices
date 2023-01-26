@@ -24,6 +24,15 @@
         Each of these rounds are “one-shot” games, meaning that decisions you make in a previous round do not impact decisions or profits you can make in later rounds.
     </p>
 
+    <br>
+
+    <b style="font-size:140%;"> Other sellers in your market </b>
+    <p>
+        In each round, you will be anonymously matched with other sellers into groups of {{ C.PLAYERS_PER_GROUP }}.
+        This matching will stay the same throughout the entire game.
+        Therefore, the other sellers in the market with you will be the same as those who were in your market in the previous round.
+    </p>
+
     <div>
         <em>Quiz 1:</em>
         {{ formfield quiz1 }}
@@ -89,7 +98,6 @@
         <em>Quiz 4:</em>
         {{ formfield quiz4 }}
     </div>
-
 
     <br>
 
@@ -418,15 +426,6 @@
         <em>Quiz 7:</em>
         {{ formfield quiz7 }}
     </div>
-
-    <br>
-
-    <b style="font-size:140%;"> Other sellers in your market </b>
-    <p>
-        In each round, you will be randomly (and anonymously) matched with other sellers into groups of {{ C.PLAYERS_PER_GROUP }}.
-        This random matching will occur at the start of each Round.
-        Therefore, the other sellers in the market with you may, or may not, be the same as those who were in your market in the previous Round.
-    </p>
 
     <br>
 
