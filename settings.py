@@ -6,7 +6,7 @@ SESSION_CONFIGS = [
         name='sticky_prices',
         display_name="Sticky Prices Experiment",
         app_sequence=['sticky_prices'],
-        num_demo_participants=10
+        num_demo_participants=2
     ),
 ]
 
@@ -16,7 +16,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, participation_fee=5.00, doc=""
+    real_world_currency_per_point=1.00, participation_fee=7.50, doc=""
 )
 
 PARTICIPANT_FIELDS = []
