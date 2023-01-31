@@ -1,0 +1,10 @@
+{{ block title }}Your Decision{{ endblock }}
+{{ block content }}
+
+    {{ include C.INSTRUCTIONS_TEMPLATE }}
+
+    <p>Do you wish to adjust your price?</p>
+    <button name="is_adjusted" value="True">Yes</button>
+    <button name="is_adjusted" value="False">No</button>
+
+{{ endblock }}

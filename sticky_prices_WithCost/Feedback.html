@@ -1,0 +1,15 @@
+{{ block title }}Feedback{{ endblock }}
+{{ block content }}
+
+    <p>
+        Please explain in 1-3 sentences what you think about the experiment and how you made your decisions.
+    </p>
+
+    <textarea class="form-control" rows="7" id="id_comment" name="comment"></textarea>
+    {% formfield_errors 'comment' %}
+
+    <br>
+
+    {{ next_button }}
+
+{{ endblock }}

@@ -1,0 +1,468 @@
+{{ block title }}
+    {{ if subsession.is_practice_round }}
+        Practice round {{ subsession.round_number }} of {{ C.NUM_PRACTICE_ROUNDS }}
+    {{ else }}
+        Round {{ subsession.real_round_number }} of {{ C.NUM_REAL_ROUNDS }}
+    {{ endif }}
+{{ endblock }}
+
+{{ block content }}
+
+{{ if subsession.is_practice_round }}
+    <p>
+        <em> Note: This is a practice round, so your profits this period will not impact your earnings in the experiment.</em>
+    </p>
+{{ endif }}
+
+<br>
+
+    <div>
+        <h4>
+            Instructions
+        </h4>
+
+        <p>
+            You are in a group of {{ C.PLAYERS_PER_GROUP }} people.
+            Each of you will be asked to choose if you decide to adjust your price.
+            Your goal as an individual is to get the highest profit for yourself.
+        </p>
+
+        <p>
+            The fee to change your price is {{ group.adjust_cost }}.
+        </p>
+
+        <p>
+            {{ if first_round }}
+                <b>In this round, everyone's production cost (including yours) has gone UP from $9.20 by $1.25, and is now $10.45.</b>
+            {{ else }}
+                {{ if up }}
+                    <b>In this round, everyone's production cost (including yours) has gone UP from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
+                {{ else }}
+                    <b>In this round, everyone's production cost (including yours) has gone DOWN from {{ C.INIT_COST }} by {{ diff }}, and is now {{ group.cost }}.</b>
+                {{ endif }}
+            {{ endif }}
+        </p>
+
+        <p>
+            You can decide if you want to adjust the initial price of {{ group.init_price }}.
+        </p>
+    </div>
+
+    <br>
+
+    <div>
+        <h4>
+            Average Price Expectation
+        </h4>
+
+        <p>
+            Before making your decision, please enter your expectations of the average market price.
+            Enter values as a probability (percentage), so each value can range from 0 to 100,
+            and the sum of those probability percentages should be <em><b> exactly </b></em> 100.
+        </p>
+
+        <br>
+
+        {{ formfield_errors 'prob6'}}
+        {{ formfield_errors 'prob7'}}
+        {{ formfield_errors 'prob8'}}
+        {{ formfield_errors 'prob9'}}
+        {{ formfield_errors 'prob10'}}
+        {{ formfield_errors 'prob11'}}
+        {{ formfield_errors 'prob12'}}
+        {{ formfield_errors 'prob13'}}
+        {{ formfield_errors 'prob14'}}
+
+        <div>
+            <label>$6:
+                   <input type="number" id='prob6' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$7:
+                   <input type="number" id='prob7' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$8:
+                   <input type="number" id='prob8' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$9:
+                   <input type="number" id='prob9' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$10:
+                   <input type="number" id='prob10' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$11:
+                   <input type="number" id='prob11' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$12:
+                   <input type="number" id='prob12' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$13:
+                   <input type="number" id='prob13' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+
+            <label>$14:
+                   <input type="number" id='prob14' min="0" max="100" value="0" oninput="calc_avg(); updateProb(); updateDescription();" onkeydown="return event.key != 'Enter';">
+            </label>
+        </div>
+
+        <input type="hidden" name="prob6" id="prob6_2" value="0"/>
+        <input type="hidden" name="prob7" id="prob7_2" value="0"/>
+        <input type="hidden" name="prob8" id="prob8_2" value="0"/>
+        <input type="hidden" name="prob9" id="prob9_2" value="0"/>
+        <input type="hidden" name="prob10" id="prob10_2" value="0"/>
+        <input type="hidden" name="prob11" id="prob11_2" value="0"/>
+        <input type="hidden" name="prob12" id="prob12_2" value="0"/>
+        <input type="hidden" name="prob13" id="prob13_2" value="0"/>
+        <input type="hidden" name="prob14" id="prob14_2" value="0"/>
+
+<!--        <script>-->
+<!--                for (let i = 6; i <= 14; i++) {-->
+<!--                    if (document.getElementById('prob' + i).value == null) {-->
+<!--                        document.getElementById("prob" + i).value = 0;-->
+<!--                    }-->
+<!--                }-->
+<!--        </script>-->
+
+        {{ formfield_errors 'expected_avg' }}
+
+        <br>
+
+        <p id="expect_avg">
+            Based on your inputs, the expected average market price will be $0.00.
+        </p>
+
+        <input type="hidden" name="expected_avg" id="expected_avg" />
+
+        <script>
+            $(":input").bind('keyup mouseup', function () {
+            var p6=$("#prob6_2").val();
+            var p7=$("#prob7_2").val();
+            var p8=$("#prob8_2").val();
+            var p9=$("#prob9_2").val();
+            var p10=$("#prob10_2").val();
+            var p11=$("#prob11_2").val();
+            var p12=$("#prob12_2").val();
+            var p13=$("#prob13_2").val();
+            var p14=$("#prob14_2").val();
+
+            var total= parseInt(p6) || 0 + parseInt(p7) || 0 + parseInt(p8) || 0 + parseInt(p9) || 0 + parseInt(p10) || 0 + parseInt(p11) || 0 + parseInt(p12) || 0 + parseInt(p13) || 0 + parseInt(p14) || 0;
+
+            if(total>100) {
+                alert("The sum of the probability percentages can't be greater than 100");
+                return false;
+              }
+            });
+
+            function calc_avg() {
+                for (let i = 6; i <= 14; i++) {
+                    document.getElementById('prob' + i + '_2').value = parseInt(document.getElementById("prob" + i).value) || 0;
+                }
+                // if (document.getElementById("prob6").value == "") {
+                // }
+                //
+                // if (document.getElementById("prob7").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob8").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob9").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob10").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob11").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob12").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob13").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+                //
+                // if (document.getElementById("prob14").value == "") {
+                //     alert("You have to put a number (ex. 0) in the probability box!")
+                // }
+
+                let expected_avg = document.getElementById("expect_avg");
+                let player_expected_avg = 0;
+                for (let i = 6; i <= 14; i++) {
+                    player_expected_avg += i * parseInt(document.getElementById("prob" + i).value || 0);
+                }
+
+                // let player_expected_avg = (6 * parseInt(document.getElementById("prob6").value) + 7 * parseInt(document.getElementById("prob7").value)
+                // + 8 * parseInt(document.getElementById("prob8").value) + 9 * parseInt(document.getElementById("prob9").value)
+                // + 10 * parseInt(document.getElementById("prob10").value) + 11 * parseInt(document.getElementById("prob11").value)
+                // + 12 * parseInt(document.getElementById("prob12").value) + 13 * parseInt(document.getElementById("prob13").value)
+                // + 14 * parseInt(document.getElementById("prob14").value)) / 100;
+                player_expected_avg_2 = (player_expected_avg/100).toFixed(2);
+                expected_avg.innerText = `Based on your inputs, the expected average market price will be $${player_expected_avg_2}.`
+                document.getElementById('expected_avg').value = player_expected_avg_2;
+            }
+        </script>
+    </div>
+
+    <br>
+
+    <div>
+        <h4>
+            Adjust Your Price
+        </h4>
+
+        <p>
+            Now you can use the slider to adjust your price.
+        </p>
+
+        <style>
+            input[name=slider_price] {
+              -webkit-appearance: none;
+              width: 100%;
+              height: 15px;
+              border-radius: 5px;
+              background: #d3d3d3;
+              outline: none;
+              opacity: 0.7;
+              -webkit-transition: .2s;
+              transition: opacity .2s;
+            }
+
+            input[name=slider_price] {
+                -webkit-appearance: none;
+                margin: 18px 0;
+                width: 100%;
+            }
+
+            input[name=slider_price]:hover {
+                opacity: 1; /* Fully shown on mouse-over */
+            }
+
+             input[name=slider_price]::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 25px;
+              height: 25px;
+              border-radius: 50%;
+              background: #1e5bff;
+              cursor: pointer;
+            }
+        </style>
+
+        {{ formfield_errors 'slider_price' }}
+
+        <input type="range" name="slider_price" id="setPrice" min="6" max="14" step="0.01" oninput="updateDescription(); update(); update_button();"  onkeydown="return event.key != 'Enter';">
+
+        <script>
+            let xyz = js_vars.init_price;
+            xyz = xyz.toFixed(2);
+            $(document).ready(function() {
+                $("#setPrice").val(xyz);
+            });
+        </script>
+
+        <script>
+            function update() {
+                let price = document.getElementById("setPrice").value;
+                document.getElementById('selected_price').innerText = `You selected $${price}.`
+            }
+        </script>
+
+        <p id="selected_price">
+              <script type="text/javascript">
+                var z = document.getElementById("setPrice").value;
+              </script>
+            The initial price is $<script type="text/javascript">document.write(z)</script>.00.
+        </p>
+
+        <p>
+            <em><font size="+1">Your Beliefs About the Average Price in the Market</font></em>
+
+            <table class="table" style="table-layout: fixed">
+                <tr>
+                    <th style="width:200px">Average Price</th><th style="width:65px">$6</th><th style="width:65px">$7</th><th style="width:65px">$8</th><th style="width:65px">$9</th><th style="width:65px">$10</th><th style="width:65px">$11</th><th style="width:65px">$12</th><th style="width:65px">$13</th><th style="width:65px">$14</th><th style="width:150px">Total Probability</th>
+                </tr>
+                <tr id="probability">
+                    <td>Probability</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td></td>
+                </tr>
+                <tr id="profitAdjust">
+                    <td>Profit from Adjusting</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr id="profitNonAdjust">
+                    <td>Profit from Not Adjusting</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            </table>
+        </p>
+
+        <script>
+            function updateProb() {
+                let Row = document.getElementById("probability");
+                let Cells = Row.getElementsByTagName("td");
+                let sum = 0;
+                // let sum = parseInt(document.getElementById("prob6").value) + parseInt(document.getElementById("prob7").value) + parseInt(document.getElementById("prob8").value)
+                //             + parseInt(document.getElementById("prob9").value) + parseInt(document.getElementById("prob10").value) + parseInt(document.getElementById("prob11").value)
+                //             + parseInt(document.getElementById("prob12").value) + parseInt(document.getElementById("prob13").value) + parseInt(document.getElementById("prob14").value);
+                for (let i = 1; i <= 9; i++) {
+                    Cells[i].innerText = parseInt(document.getElementById("prob" + (i+5)).value) || 0;
+                    sum += parseInt(document.getElementById("prob" + (i+5)).value) || 0;
+                }
+
+                // Cells[1].innerText = parseInt(document.getElementById("prob" + 6).value) || 0
+                // Cells[2].innerText = parseInt(document.getElementById("prob7").value) || 0
+                // Cells[3].innerText = parseInt(document.getElementById("prob8").value)
+                // Cells[4].innerText = parseInt(document.getElementById("prob9").value)
+                // Cells[5].innerText = parseInt(document.getElementById("prob10").value)
+                // Cells[6].innerText = parseInt(document.getElementById("prob11").value)
+                // Cells[7].innerText = parseInt(document.getElementById("prob12").value)
+                // Cells[8].innerText = parseInt(document.getElementById("prob13").value)
+                // Cells[9].innerText = parseInt(document.getElementById("prob14").value)
+                Cells[10].innerText = sum;
+            }
+        </script>
+
+        <style type="text/css">
+            table td#changed_profit {border:solid 4px red}
+            table td#unchanged_profit {border:solid 4px red}
+            td {white-space:nowrap}
+        </style>
+
+        <p>
+            <table id="description" class="table" style="width:750px; margin-left:auto;margin-right:auto;">
+                <tr>
+                    <th>Therefore, if you</th><th></th><th id="expected_profit">Your Expected Profit (computed based on your belief)</th>
+                </tr>
+                <tr id="final_profit">
+                    <td style="width:200px">Change price to:</td><td style="width:120px">{{ player.slider_price }}</td><td id="changed_profit">$0.00</td>
+                </tr>
+                <tr id="final_init_profit">
+                    <td>Keep price at:</td><td>{{ group.init_price }}</td><td id="unchanged_profit">$0.00</td>
+                </tr>
+            </table>
+        </p>
+
+        <script>
+            let cost = js_vars.cost;
+            let alpha = js_vars.alpha;
+            let beta = js_vars.beta;
+            let theta = js_vars.theta;
+            let adjust_cost = js_vars.adjust_cost;
+            let init_price = js_vars.init_price;
+
+            function updateDescription() {
+                let price = document.getElementById("setPrice").value;
+
+                //Row of profit from adjusting
+                let profitAdjust6 = ((price - cost) * (alpha - beta * price + theta * 6) - adjust_cost).toFixed(2);
+                let profitAdjust7 = ((price - cost) * (alpha - beta * price + theta * 7) - adjust_cost).toFixed(2);
+                let profitAdjust8 = ((price - cost) * (alpha - beta * price + theta * 8) - adjust_cost).toFixed(2);
+                let profitAdjust9 = ((price - cost) * (alpha - beta * price + theta * 9) - adjust_cost).toFixed(2);
+                let profitAdjust10 = ((price - cost) * (alpha - beta * price + theta * 10) - adjust_cost).toFixed(2);
+                let profitAdjust11 = ((price - cost) * (alpha - beta * price + theta * 11) - adjust_cost).toFixed(2);
+                let profitAdjust12 = ((price - cost) * (alpha - beta * price + theta * 12) - adjust_cost).toFixed(2);
+                let profitAdjust13 = ((price - cost) * (alpha - beta * price + theta * 13) - adjust_cost).toFixed(2);
+                let profitAdjust14 = ((price - cost) * (alpha - beta * price + theta * 14) - adjust_cost).toFixed(2);
+                let Row2 = document.getElementById("profitAdjust");
+                let Cells2 = Row2.getElementsByTagName("td");
+                Cells2[1].innerText = `$${profitAdjust6}`
+                Cells2[2].innerText = `$${profitAdjust7}`
+                Cells2[3].innerText = `$${profitAdjust8}`
+                Cells2[4].innerText = `$${profitAdjust9}`
+                Cells2[5].innerText = `$${profitAdjust10}`
+                Cells2[6].innerText = `$${profitAdjust11}`
+                Cells2[7].innerText = `$${profitAdjust12}`
+                Cells2[8].innerText = `$${profitAdjust13}`
+                Cells2[9].innerText = `$${profitAdjust14}`
+
+                //Row of profit from non_adjusting
+                let profitNonAdjust6 = ((init_price - cost) * (alpha - beta * init_price + theta * 6)).toFixed(2);
+                let profitNonAdjust7 = ((init_price - cost) * (alpha - beta * init_price + theta * 7)).toFixed(2);
+                let profitNonAdjust8 = ((init_price - cost) * (alpha - beta * init_price + theta * 8)).toFixed(2);
+                let profitNonAdjust9 = ((init_price - cost) * (alpha - beta * init_price + theta * 9)).toFixed(2);
+                let profitNonAdjust10 = ((init_price - cost) * (alpha - beta * init_price + theta * 10)).toFixed(2);
+                let profitNonAdjust11 = ((init_price - cost) * (alpha - beta * init_price + theta * 11)).toFixed(2);
+                let profitNonAdjust12 = ((init_price - cost) * (alpha - beta * init_price + theta * 12)).toFixed(2);
+                let profitNonAdjust13 = ((init_price - cost) * (alpha - beta * init_price + theta * 13)).toFixed(2);
+                let profitNonAdjust14 = ((init_price - cost) * (alpha - beta * init_price + theta * 14)).toFixed(2);
+                let Row_non = document.getElementById("profitNonAdjust");
+                let Cells_non = Row_non.getElementsByTagName("td");
+                Cells_non[1].innerText = `$${profitNonAdjust6}`
+                Cells_non[2].innerText = `$${profitNonAdjust7}`
+                Cells_non[3].innerText = `$${profitNonAdjust8}`
+                Cells_non[4].innerText = `$${profitNonAdjust9}`
+                Cells_non[5].innerText = `$${profitNonAdjust10}`
+                Cells_non[6].innerText = `$${profitNonAdjust11}`
+                Cells_non[7].innerText = `$${profitNonAdjust12}`
+                Cells_non[8].innerText = `$${profitNonAdjust13}`
+                Cells_non[9].innerText = `$${profitNonAdjust14}`
+
+                //Row of final profit from adjusting
+                let Row = document.getElementById("final_profit");
+                let Cells = Row.getElementsByTagName("td");
+                let list_profitAdjust = [profitAdjust6, profitAdjust7, profitAdjust8, profitAdjust9, profitAdjust10,
+                profitAdjust11, profitAdjust12, profitAdjust13, profitAdjust14];
+                let expected_profit = 0;
+                for (let i = 0; i <= 8; i++) {
+                    expected_profit += list_profitAdjust[i] * (parseInt(document.getElementById("prob" + (i+6)).value) || 0);
+                }
+                expected_profit = (expected_profit/100).toFixed(2);
+                // let expected_profit = ((profitAdjust6 * parseInt(document.getElementById("prob6").value) + profitAdjust7 * parseInt(document.getElementById("prob7").value)
+                //     + profitAdjust8 * parseInt(document.getElementById("prob8").value) + profitAdjust9 * parseInt(document.getElementById("prob9").value)
+                //     + profitAdjust10 * parseInt(document.getElementById("prob10").value) + profitAdjust11 * parseInt(document.getElementById("prob11").value)
+                //     + profitAdjust12 * parseInt(document.getElementById("prob12").value) + profitAdjust13 * parseInt(document.getElementById("prob13").value)
+                //     + profitAdjust14 * parseInt(document.getElementById("prob14").value))/100).toFixed(2);
+                Cells[1].innerText = `$${price}`
+                Cells[2].innerText = `$${expected_profit}`
+
+                //Row of final profit from non_adjusting
+                let Row_init_non = document.getElementById("final_init_profit");
+                let Cells_init_non = Row_init_non.getElementsByTagName("td");
+                let list_profitNonAdjust = [profitNonAdjust6, profitNonAdjust7, profitNonAdjust8, profitNonAdjust9, profitNonAdjust10,
+                profitNonAdjust11, profitNonAdjust12, profitNonAdjust13, profitNonAdjust14];
+                let expected_init_profit = 0;
+                for (let i = 0; i <= 8; i++) {
+                    expected_init_profit += list_profitNonAdjust[i] * (parseInt(document.getElementById("prob" + (i+6)).value) || 0);
+                }
+                expected_init_profit = (expected_init_profit/100).toFixed(2);
+                // let expected_init_profit = ((profitNonAdjust6 * parseInt(document.getElementById("prob6").value) + profitNonAdjust7 * parseInt(document.getElementById("prob7").value)
+                //     + profitNonAdjust8 * parseInt(document.getElementById("prob8").value) + profitNonAdjust9 * parseInt(document.getElementById("prob9").value)
+                //     + profitNonAdjust10 * parseInt(document.getElementById("prob10").value) + profitNonAdjust11 * parseInt(document.getElementById("prob11").value)
+                //     + profitNonAdjust12 * parseInt(document.getElementById("prob12").value) + profitNonAdjust13 * parseInt(document.getElementById("prob13").value)
+                //     + profitNonAdjust14 * parseInt(document.getElementById("prob14").value))/100).toFixed(2);
+                Cells_init_non[1].innerText = `$10.00`
+                Cells_init_non[2].innerText = `$${expected_init_profit}`
+            }
+        </script>
+
+    </div>
+
+    <br>
+
+    <h4>
+        Your Decision
+    </h4>
+
+    <p>Do you wish to adjust your price?</p>
+
+    <button name="is_adjusted" value="True" id="adjust_button" style="width:300px; text-align:left;">Yes, I want to adjust my price to {{ player.slider_price }}.</button>
+    <button name="is_adjusted" value="False" style="width:335px; text-align:left;">No, I'd like to keep the initial price of {{ group.init_price }}.</button>
+
+    <script>
+        function update_button() {
+            let price = document.getElementById("setPrice").value;
+            document.getElementById('adjust_button').innerText = `Yes, I want to adjust my price to $${price}.`;
+        }
+    </script>
+
+{{ endblock }}

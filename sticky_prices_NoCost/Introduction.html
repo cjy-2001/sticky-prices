@@ -35,13 +35,12 @@
     <p>
         In each round you will begin with an old sale price of {{ group.init_price }}.
         Call this yesterday’s price.
-        Yesterday’s production cost of a widget was {{ group.cost }}.
+        Yesterday’s production cost of a widget was {{ C.INIT_COST }}.
         In each round you will be notified of a change in your production cost.
         When your production cost falls it will be cheaper for you to produce the widgets,
         and, similarly, when your production cost rises it will be more expensive for you to produce the widgets.
         With these new production costs, you will decide what you would like your new price to be.
         You can leave your price at {{ group.init_price }} or change it to whatever level you like.
-        Note that it’s possible that leaving your price at yesterday’s price of {{ group.init_price }} may be the best thing to do.
         <b>All the other sellers in the market will face the same production costs as you do.</b>
     </p>
 
@@ -60,8 +59,7 @@
     </p>
 
     <p>
-        The profits you earn in each round are determined by your price, your production cost, the average price set in the market,
-        and if you incur a fee associated with changing your price from {{ group.init_price }}.
+        The profits you earn in each round are determined by your price, your production cost, and the average price set in the market.
         The profits you earn in each round will be determined by:
     </p>
 
@@ -177,7 +175,8 @@
         In Profit Example 1, the computer is showing you that if you change your price to $11.00 you should expect to lose $0.28 in this round.
         Alternatively, it also shows you that if you leave your price at $10.00, you should expect to earn $2.32 in this round.
         It is important to emphasize that these calculations are computed using your beliefs about what the average price in the market will be.
-        Thus, conditional on your beliefs and costs of selling the widgets, you would be best to leave your price at $10.00 in this round.
+        Thus, conditional on your beliefs and costs of selling the widgets, it would be better to leave your price at $10 in this round than to change your price to $11.
+        Note that $11 might not be the best choice you could make for setting a price.
     </p>
 
     <p>
@@ -198,7 +197,7 @@
     <p>
         In Profit Example 2, the computer is showing you that if you change your price to $12.60 you should expect to earn $2.44 in this round.
         Alternatively, it also shows you that if you leave your price at $10.00, you should expect to lose $7.40 in this round.
-        Thus, conditional on your beliefs and costs of selling the widgets, you would be best to change your price in this round.
+        Thus, conditional on your beliefs and costs of selling the widgets, you would be better to change your price to 12.60 relative to leaving it at $10.
     </p>
 
     <p>

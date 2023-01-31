@@ -1,12 +1,19 @@
 from os import environ
 
+NUM_PLAYERS = 10
 
 SESSION_CONFIGS = [
     dict(
-        name='sticky_prices',
+        name='sticky_prices_NoCost',
         display_name="Sticky Prices Experiment",
-        app_sequence=['sticky_prices'],
-        num_demo_participants=2
+        app_sequence=['sticky_prices_NoCost'],
+        num_demo_participants=NUM_PLAYERS
+    ),
+    dict(
+        name='sticky_prices_WithCost',
+        display_name="Sticky Prices Experiment (with adjustment cost)",
+        app_sequence=['sticky_prices_WithCost'],
+        num_demo_participants=NUM_PLAYERS
     ),
 ]
 

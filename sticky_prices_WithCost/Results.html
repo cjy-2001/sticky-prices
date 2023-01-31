@@ -1,0 +1,47 @@
+{{ block title }}Results{{ endblock }}
+{{ block content }}
+
+    {{ if player.timeout }}
+
+        <p>
+            The average price in the round was {{ group.avg }}, and you did not enter a decision.
+        </p>
+
+        <p>
+            Your price was kept at $10.00, and your profit was {{ player.profit }}.
+        </p>
+
+    {{ else }}
+
+        <p>
+            The average price in the round was {{ group.avg }}, and your expected average market price was {{ player.expected_avg }}.
+
+        </p>
+            {{ num_adjusted }} player(s) in your group just changed the price.
+        <p>
+
+        </p>
+
+        <p>
+            {{ if player.is_adjusted }}
+                You adjusted your price to {{ player.price }}, and your profit was {{ player.profit }}.
+                If, instead, you had keep the initial price of {{ group.init_price }}, your profit would have been {{ player.sec_profit }}.
+            {{ else }}
+                Your kept your price at {{ player.price }}, and your profit was {{ player.profit }}.
+                If, instead, you had changed your price to {{ player.slider_price }} (the last position on your price slider), your profit would have been {{ player.sec_profit }}.
+            {{ endif }}
+        </p>
+
+    {{ endif }}
+
+    <p>
+        {{ if subsession.is_practice_round }}
+            Now your accumulated earnings are {{ practice_earnings }}.
+        {{ else }}
+            Now your accumulated earnings are {{ player_earnings }}.
+        {{ endif }}
+    </p>
+
+{{ next_button }}
+
+{{ endblock }}

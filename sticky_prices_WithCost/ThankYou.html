@@ -1,0 +1,18 @@
+{{ block title }}Thank you{{ endblock }}
+{{ block content }}
+
+    <p>
+        <em>Thank you very much for your input on this experiment!</em>
+    </p>
+
+    {{ if player.earnings > 0 }}
+
+    <p>
+        We will send your payment of {{ total_earnings }} soon!
+    </p>
+
+    {{ endif }}
+
+    {{ formfields }}
+
+{{ endblock }}

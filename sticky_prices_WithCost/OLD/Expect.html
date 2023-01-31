@@ -1,0 +1,14 @@
+{{ block title }}Expected Profit{{ endblock }}
+{{ block content }}
+
+    <p>
+        Based on your expection, the average price will be {{ player.expected_avg }}.
+        Your profit will be {{ player.expected_profit }}.
+    </p>
+
+    <p>Do you want to change your belief of other sellers' price?</p>
+
+    <button name ="redo" value="True">Yes</button>
+    <button name ="redo" value="False">No</button>
+
+{{ endblock }}
