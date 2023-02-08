@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 5
+    PLAYERS_PER_GROUP = 2
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 16
+    NUM_REAL_ROUNDS = 2
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices_NoCost'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices_NoCost/instructions.html'
@@ -68,7 +68,7 @@ class Player(BasePlayer):
     quiz1 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I will stay with the same group of 5 people throughout the entire experiment", "B. Other people will get re-sorted so that I am not with the same 5 people I had played with previously"],
                                label="When you move to a new round, you will have another decision to make about adjusting your price or keeping it at $10. "
-                                     "Do you stay with the same 5 people from round to round, or does group membership get reshuffled each time?”")
+                                     "Do you stay with the same 5 people from round to round, or does group membership get reshuffled each time?")
     quiz2 = models.StringField(widget=widgets.RadioSelect,
                                choices=["A. I must charge $10.00", "B. I am not allowed to charge $10.00", "C. I can keep my price at $10.00 or I can change it"],
                                label="If yesterday’s price is $10.00, which of the following is true:")
@@ -132,9 +132,9 @@ def set_payoffs(group: Group):
     for p in players:
         p.profit = calc_profit(p, group.avg)
         if p.is_adjusted:
-            p.sec_profit = sec_calc_profit(p, group.avg)
+            p.sec_profit = calc_profit_on_initial(p, group.avg)
         else:
-            p.sec_profit = thi_calc_profit(p, group.avg)
+            p.sec_profit = calc_profit_on_slide(p, group.avg)
 
         if not group.subsession.is_practice_round:
             practice_player = p.in_round(1)
@@ -174,14 +174,14 @@ def calc_profit(player: Player, group_avg):
         return gross_profit
 
 
-def sec_calc_profit(player: Player, group_avg):
+def calc_profit_on_initial(player: Player, group_avg):
     gross_profit = cu((player.group.init_price - player.group.cost) * \
                        (player.group.alpha - player.group.beta * player.group.init_price + player.group.theta * group_avg))
 
     return gross_profit
 
 
-def thi_calc_profit(player: Player, group_avg):
+def calc_profit_on_slide(player: Player, group_avg):
     gross_profit = cu((player.slider_price - player.group.cost) * \
                        (player.group.alpha - player.group.beta * player.slider_price + player.group.theta * group_avg))
 
@@ -257,6 +257,7 @@ class Introduction(Page):
                     player_price=player.price,
                     player_profit=player.profit,
                     play_adjusted=player.is_adjusted,
+                    player_earnings=player.earnings,
                     prob6=player.prob6,
                     prob7=player.prob7,
                     prob8=player.prob8,
@@ -281,12 +282,13 @@ class Introduction(Page):
                     quiz5='quiz5',
                     quiz6='quiz6',
                     quiz7='quiz7'
+
                     )
 
 
 
 class SetPrice(Page):
-    timeout_seconds = 180
+    timeout_seconds = 1800
     form_model = 'player'
     form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'slider_price', 'expected_avg', 'is_adjusted']
 
@@ -316,6 +318,7 @@ class SetPrice(Page):
             return dict(player_expected_avg=player.expected_avg,
                         player_price=player.price,
                         player_slider_price=player.slider_price,
+                        player_earnings=player.earnings,
                         player_profit=player.profit,
                         play_adjusted=player.is_adjusted,
                         prob6=player.prob6,
@@ -341,6 +344,7 @@ class SetPrice(Page):
             return dict(player_expected_avg=player.expected_avg,
                         player_slider_price=player.slider_price,
                         player_price=player.price,
+                        player_earnings=player.earnings,
                         player_profit=player.profit,
                         play_adjusted=player.is_adjusted,
                         prob6=player.prob6,
@@ -388,7 +392,7 @@ class ResultsWaitPage3(WaitPage):
     pass
 
 class Results(Page):
-    timeout_seconds = 60
+    timeout_seconds = 600
     timer_text = "Time left to advance to the next page:"
 
     @staticmethod
@@ -397,11 +401,11 @@ class Results(Page):
         practice_earnings = earnings_history(player)
         num_adjusted = 0
 
-        for player in group.get_players():
-            if player.is_adjusted:
+        for p in group.get_players():
+            if p.is_adjusted:
                 num_adjusted += 1
 
-        return dict(player_expected_avg = player.expected_avg,
+        return dict(player_expected_avg=player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price=player.price,
                     player_profit=player.profit,
@@ -483,9 +487,10 @@ class LotteryResult(Page):
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price = player.price,
+                    player_earnings=player.earnings,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
-                    player_earnings= player.earnings,
+
 
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,
@@ -518,9 +523,9 @@ class Feedback(Page):
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price = player.price,
+                    player_earnings=player.earnings,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
-                    player_earnings= player.earnings,
 
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,
@@ -551,9 +556,9 @@ class ThankYou(Page):
         return dict(player_expected_avg = player.expected_avg,
                     player_slider_price=player.slider_price,
                     player_price = player.price,
+                    player_earnings=player.earnings,
                     player_profit = player.profit,
                     player_adjusted = player.is_adjusted,
-                    player_earnings= player.earnings,
 
                     group_avg = player.group.avg,
                     group_cost = player.group.cost,

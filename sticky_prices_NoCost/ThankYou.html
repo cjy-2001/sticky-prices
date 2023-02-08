@@ -5,12 +5,14 @@
         <em>Thank you very much for your input on this experiment!</em>
     </p>
 
-    {{ if player.earnings > 0 }}
-
-    <p>
-        We will send your payment of {{ total_earnings }} soon!
-    </p>
-
+    {{ if player.earnings < 7.5 }}
+        <p>
+            We will send your payment of $7.50 soon!
+        </p>
+    {{ else }}
+        <p>
+            We will send your payment of {{ total_earnings }} soon!
+        </p>
     {{ endif }}
 
     {{ formfields }}
