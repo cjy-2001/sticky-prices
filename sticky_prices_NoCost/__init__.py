@@ -10,9 +10,9 @@ See https://www.nber.org/system/files/working_papers/w2327/w2327.pdf
 
 
 class C(BaseConstants):
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = 5
     NUM_PRACTICE_ROUNDS = 1
-    NUM_REAL_ROUNDS = 2
+    NUM_REAL_ROUNDS = 16
     NUM_ROUNDS = NUM_PRACTICE_ROUNDS + NUM_REAL_ROUNDS
     NAME_IN_URL = 'sticky_prices_NoCost'
     INSTRUCTIONS_TEMPLATE = 'sticky_prices_NoCost/instructions.html'
@@ -288,7 +288,7 @@ class Introduction(Page):
 
 
 class SetPrice(Page):
-    timeout_seconds = 1800
+    timeout_seconds = 180
     form_model = 'player'
     form_fields =  ['prob6', 'prob7', 'prob8', 'prob9', 'prob10', 'prob11', 'prob12', 'prob13', 'prob14', 'slider_price', 'expected_avg', 'is_adjusted']
 
@@ -392,7 +392,7 @@ class ResultsWaitPage3(WaitPage):
     pass
 
 class Results(Page):
-    timeout_seconds = 600
+    timeout_seconds = 60
     timer_text = "Time left to advance to the next page:"
 
     @staticmethod

@@ -1,6 +1,6 @@
 from os import environ
 
-NUM_PLAYERS = 2
+NUM_PLAYERS = 10
 
 SESSION_CONFIGS = [
     dict(
