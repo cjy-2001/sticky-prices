@@ -51,4 +51,4 @@ Make sure to reset the database between test sessions.
 
 ## About
 
-This oTree app was built for a professor to run real classroom experiments for researching nominal rigidity in economics. The experiment workflow and theory is based on the paper [Sticky Prices](https://www.nber.org/system/files/working_papers/w2327/w2327.pdf).
+This oTree app was built for [Dr. Munro](https://sites.google.com/site/munrodavidr/home) to run real classroom experiments for researching nominal rigidity in economics. The experiment workflow and theory is based on the paper [Sticky Prices](https://www.nber.org/system/files/working_papers/w2327/w2327.pdf).
