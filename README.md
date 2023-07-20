@@ -20,7 +20,7 @@ At the end, there is a survey to collect demographics and measure loss aversion.
 
 ## Details
 
-The main logic is in [`__init__.py`](https://github.com/cjy-2001/otree_experiment/blob/main/sticky_prices_WithCost/__init__.py). Key elements:
+The main logic is in [`__init__.py`](https://github.com/cjy-2001/sticky-prices/blob/main/sticky_prices_WithCost/__init__.py). Key elements:
 
 - Introduction page explains instructions
 - 7 question quiz to check understanding
