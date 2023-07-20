@@ -38,6 +38,14 @@ The main logic is in [`__init__.py`](https://github.com/cjy-2001/sticky-prices/b
 
 Player data can be analyzed using pagetimes.py to calculate time per page.
 
+## Installation
+
+Make sure oTree is installed before running the app:
+
+```bash
+pip install otree
+```
+
 ## Usage
 
 To run the app:
