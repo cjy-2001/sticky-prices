@@ -4,6 +4,8 @@ This is an oTree app for running an economic experiment on sticky prices and nom
 
 ## Overview
 
+![preview](preview.png)
+
 In each round, players act as firms who must set a price for their product. There is an initial default price, but players can choose to adjust this price up or down.
 
 The profit for each player depends on:
@@ -52,7 +54,7 @@ To run the app:
 
 1. Direct to the right directory (there are two versions of the game, with or without Adjust Cost)
 2. Reset the database: otree resetdb
-3. Start the server: otree runserver
+3. Start the server: otree devserver
 4. Go to http://localhost:8000
 
 Make sure to reset the database between test sessions.
