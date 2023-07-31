@@ -1,5 +1,7 @@
 # OTree Experiment - Sticky Prices
 
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+
 > An oTree app for running an economic experiment on sticky prices and nominal rigidity.
 
 ## Table of Contents
