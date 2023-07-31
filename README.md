@@ -1,6 +1,13 @@
 # OTree Experiment - Sticky Prices
 
-This is an oTree app for running an economic experiment on sticky prices and nominal rigidity.
+> An oTree app for running an economic experiment on sticky prices and nominal rigidity.
+
+## Table of Contents
+- [Overview](#overview)
+- [Details](#details)
+- [Installation](#installation)
+- [Usage](#usage)
+- [About](#about)
 
 ## Overview
 
